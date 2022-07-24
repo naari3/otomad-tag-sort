@@ -52,7 +52,7 @@ func createCharts(videos []Video) error {
 
 func createChartsForYear(videos []Video, year int) error {
 	fmt.Println("Start year:", year)
-	err := os.Mkdir("html/"+strconv.Itoa(year), os.ModePerm)
+	err := os.MkdirAll("html/"+strconv.Itoa(year), os.ModePerm)
 	if err != nil {
 		return err
 	}

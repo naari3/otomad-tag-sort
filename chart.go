@@ -13,7 +13,7 @@ func createBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 		charts.WithDataZoomOpts(opts.DataZoom{
 			Type:     "slider",
 			Start:    0,
-			End:      0.1,
+			End:      1,
 			Throttle: 0,
 		}),
 		charts.WithInitializationOpts(opts.Initialization{
