@@ -9,7 +9,13 @@ func createBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
-		charts.WithTooltipOpts(opts.Tooltip{Show: true}),
+		charts.WithTooltipOpts(opts.Tooltip{
+			Show:    true,
+			Trigger: "axis",
+			AxisPointer: &opts.AxisPointer{
+				Type: "shadow",
+			},
+		}),
 		charts.WithDataZoomOpts(opts.DataZoom{
 			Type:     "inside",
 			Start:    0,
