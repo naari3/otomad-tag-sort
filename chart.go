@@ -11,7 +11,7 @@ func createBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
 		charts.WithTooltipOpts(opts.Tooltip{Show: true}),
 		charts.WithDataZoomOpts(opts.DataZoom{
-			Type:     "slider",
+			Type:     "inside",
 			Start:    0,
 			End:      1,
 			Throttle: 0,
