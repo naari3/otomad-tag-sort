@@ -1,4 +1,4 @@
-module github.com/naari3/otagood
+module github.com/naari3/otagged
 
 go 1.18
 

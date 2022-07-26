@@ -5,6 +5,8 @@ import (
 	"os"
 	"sort"
 	"strconv"
+
+	"github.com/go-echarts/go-echarts/v2/opts"
 )
 
 func createCharts(videos []Video) error {
@@ -38,7 +40,7 @@ func createCharts(videos []Video) error {
 	}
 	wc.Render(fwc)
 
-	pie := createPieChart(countMap, sortedTags, 100)
+	pie := createPieChart(countMap, sortedTags, 75)
 	fpie, err := os.Create("html/pie.html")
 	if err != nil {
 		return err
@@ -75,6 +77,7 @@ func createChartsForYear(videos []Video, year int) error {
 	fmt.Println("Sorted By counts")
 
 	bar := createBarChart(countMap, sortedTags)
+	bar.Title = opts.Title{Title: "音MAD タグ分布 " + strconv.Itoa(year)}
 	fbar, err := os.Create("html/" + strconv.Itoa(year) + "/bar.html")
 	if err != nil {
 		return err
@@ -82,13 +85,15 @@ func createChartsForYear(videos []Video, year int) error {
 	bar.Render(fbar)
 
 	wc := createWordCloud(countMap, sortedTags, 5)
+	wc.Title = opts.Title{Title: "音MAD タグ分布 " + strconv.Itoa(year)}
 	fwc, err := os.Create("html/" + strconv.Itoa(year) + "/wc.html")
 	if err != nil {
 		return err
 	}
 	wc.Render(fwc)
 
-	pie := createPieChart(countMap, sortedTags, 100)
+	pie := createPieChart(countMap, sortedTags, 75)
+	pie.Title = opts.Title{Title: "音MAD タグ分布 " + strconv.Itoa(year)}
 	fpie, err := os.Create("html/" + strconv.Itoa(year) + "/pie.html")
 	if err != nil {
 		return err
