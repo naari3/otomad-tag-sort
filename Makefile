@@ -4,14 +4,14 @@ bin:
 clean:
 	rm -rf bin/*
 
-run: otagged
-	./bin/otagged
+run: otomad-tag-sort
+	./bin/otomad-tag-sort
 
-run-collect: otagged-collect
-	./bin/otagged-collect
+run-collect: otomad-tag-sort-collect
+	./bin/otomad-tag-sort-collect
 
-otagged: bin
-	go build -o bin/otagged ./cmd/otagged
+otomad-tag-sort: bin
+	go build -o bin/otomad-tag-sort ./cmd/otomad-tag-sort
 
-otagged-collect: bin
-	go build -o bin/otagged-collect ./cmd/otagged-collect
+otomad-tag-sort-collect: bin
+	go build -o bin/otomad-tag-sort-collect ./cmd/otomad-tag-sort-collect

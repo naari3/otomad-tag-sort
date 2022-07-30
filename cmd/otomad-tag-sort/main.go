@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/go-echarts/go-echarts/v2/opts"
-	"github.com/naari3/otagged/pkg/chart"
-	"github.com/naari3/otagged/pkg/nicovideo"
+	"github.com/naari3/otomad-tag-sort/pkg/chart"
+	"github.com/naari3/otomad-tag-sort/pkg/nicovideo"
 )
 
 func createCharts(videos []nicovideo.Video) error {

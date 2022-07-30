@@ -1,4 +1,4 @@
-module github.com/naari3/otagged
+module github.com/naari3/otomad-tag-sort
 
 go 1.18
 

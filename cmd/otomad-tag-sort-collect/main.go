@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/naari3/otagged/pkg/nicovideo"
+	"github.com/naari3/otomad-tag-sort/pkg/nicovideo"
 )
 
 func main() {

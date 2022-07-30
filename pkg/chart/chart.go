@@ -1,11 +1,62 @@
 package chart
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
+	"github.com/go-echarts/go-echarts/v2/render"
+	tpls "github.com/go-echarts/go-echarts/v2/templates"
 )
+
+var HeaderTpl = `
+{{ define "header" }}
+<head>
+    <meta charset="utf-8">
+    <title>{{ .PageTitle }}</title>
+{{- range .JSAssets.Values }}
+    <script src="{{ . }}"></script>
+{{- end }}
+{{- range .CustomizedJSAssets.Values }}
+    <script src="{{ . }}"></script>
+{{- end }}
+{{- range .CSSAssets.Values }}
+    <link href="{{ . }}" rel="stylesheet">
+{{- end }}
+{{- range .CustomizedCSSAssets.Values }}
+    <link href="{{ . }}" rel="stylesheet">
+{{- end }}
+</head>
+{{ end }}
+`
+
+type myOwnRender struct {
+	c      interface{}
+	before []func()
+}
+
+func NewMyOwnRender(c interface{}, before ...func()) render.Renderer {
+	return &myOwnRender{c: c, before: before}
+}
+
+func (r *myOwnRender) Render(w io.Writer) error {
+	for _, fn := range r.before {
+		fn()
+	}
+
+	contents := []string{HeaderTpl, tpls.BaseTpl, tpls.ChartTpl}
+	tpl := render.MustTemplate("chart", contents)
+
+	var buf bytes.Buffer
+	if err := tpl.ExecuteTemplate(&buf, "chart", r.c); err != nil {
+		return err
+	}
+
+	_, err := w.Write(buf.Bytes())
+	return err
+}
 
 func CreateBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 	bar := charts.NewBar()
