@@ -133,6 +133,9 @@ func (v *Video) NormalizedTags() []string {
 func findJSONL(root string) []string {
 	var files []string
 	filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 		if info.IsDir() {
 			return nil
 		}

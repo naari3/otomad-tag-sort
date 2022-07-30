@@ -30,21 +30,21 @@ func createCharts(videos []nicovideo.Video) error {
 	fmt.Println("Sorted By counts")
 
 	bar := chart.CreateBarChart(countMap, sortedTags)
-	fbar, err := os.Create("html/bar.html")
+	fbar, err := os.Create("docs/bar.html")
 	if err != nil {
 		return err
 	}
 	bar.Render(fbar)
 
 	wc := chart.CreateWordCloud(countMap, sortedTags, 5)
-	fwc, err := os.Create("html/wc.html")
+	fwc, err := os.Create("docs/wc.html")
 	if err != nil {
 		return err
 	}
 	wc.Render(fwc)
 
 	pie := chart.CreatePieChart(countMap, sortedTags, 75)
-	fpie, err := os.Create("html/pie.html")
+	fpie, err := os.Create("docs/pie.html")
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func createCharts(videos []nicovideo.Video) error {
 
 func createChartsForYear(videos []nicovideo.Video, year int) error {
 	fmt.Println("Start year:", year)
-	err := os.MkdirAll("html/"+strconv.Itoa(year), os.ModePerm)
+	err := os.MkdirAll("docs/"+strconv.Itoa(year), os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func createChartsForYear(videos []nicovideo.Video, year int) error {
 
 	bar := chart.CreateBarChart(countMap, sortedTags)
 	bar.Title = opts.Title{Title: "音MAD タグ分布 " + strconv.Itoa(year)}
-	fbar, err := os.Create("html/" + strconv.Itoa(year) + "/bar.html")
+	fbar, err := os.Create("docs/" + strconv.Itoa(year) + "/bar.html")
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func createChartsForYear(videos []nicovideo.Video, year int) error {
 
 	wc := chart.CreateWordCloud(countMap, sortedTags, 5)
 	wc.Title = opts.Title{Title: "音MAD タグ分布 " + strconv.Itoa(year)}
-	fwc, err := os.Create("html/" + strconv.Itoa(year) + "/wc.html")
+	fwc, err := os.Create("docs/" + strconv.Itoa(year) + "/wc.html")
 	if err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func createChartsForYear(videos []nicovideo.Video, year int) error {
 
 	pie := chart.CreatePieChart(countMap, sortedTags, 75)
 	pie.Title = opts.Title{Title: "音MAD タグ分布 " + strconv.Itoa(year)}
-	fpie, err := os.Create("html/" + strconv.Itoa(year) + "/pie.html")
+	fpie, err := os.Create("docs/" + strconv.Itoa(year) + "/pie.html")
 	if err != nil {
 		return err
 	}

@@ -1,3 +1,4 @@
+.PHONY: create-index
 bin:
 	mkdir -p bin
 
@@ -15,3 +16,6 @@ otomad-tag-sort: bin
 
 otomad-tag-sort-collect: bin
 	go build -o bin/otomad-tag-sort-collect ./cmd/otomad-tag-sort-collect
+
+create-index:
+	cd docs/ && python ../generate_directory_index_caddystyle.py -r

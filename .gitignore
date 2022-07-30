@@ -3,6 +3,6 @@
 !/jsonl/.gitkeep
 /jsonl_append/*
 !/jsonl_append/.gitkeep
-# /html/*
-# !/html/.gitkeep
+# /docs/*
+# !/docs/.gitkeep
 /bin/*
