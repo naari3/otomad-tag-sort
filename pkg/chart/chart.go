@@ -16,6 +16,7 @@ var HeaderTpl = `
 <head>
     <meta charset="utf-8">
     <title>{{ .PageTitle }}</title>
+	<style>body {margin: 0;}</style>
 {{- range .JSAssets.Values }}
     <script src="{{ . }}"></script>
 {{- end }}
@@ -32,21 +33,37 @@ var HeaderTpl = `
 {{ end }}
 `
 
-type myOwnRender struct {
+var ChartTpl = `
+{{- define "chart" }}
+<!DOCTYPE html>
+<html>
+    {{- template "header" . }}
+<body>
+    {{- template "base" . }}
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>
+{{ end }}
+`
+
+type noMarginRender struct {
 	c      interface{}
 	before []func()
 }
 
-func NewMyOwnRender(c interface{}, before ...func()) render.Renderer {
-	return &myOwnRender{c: c, before: before}
+func NewNoMarginRender(c interface{}, before ...func()) render.Renderer {
+	return &noMarginRender{c: c, before: before}
 }
 
-func (r *myOwnRender) Render(w io.Writer) error {
+func (r *noMarginRender) Render(w io.Writer) error {
 	for _, fn := range r.before {
 		fn()
 	}
 
-	contents := []string{HeaderTpl, tpls.BaseTpl, tpls.ChartTpl}
+	contents := []string{HeaderTpl, tpls.BaseTpl, ChartTpl}
 	tpl := render.MustTemplate("chart", contents)
 
 	var buf bytes.Buffer
@@ -60,6 +77,7 @@ func (r *myOwnRender) Render(w io.Writer) error {
 
 func CreateBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 	bar := charts.NewBar()
+	bar.Renderer = NewNoMarginRender(bar, bar.Validate)
 	bar.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
 		charts.WithTooltipOpts(opts.Tooltip{
@@ -77,7 +95,7 @@ func CreateBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 		}),
 		charts.WithInitializationOpts(opts.Initialization{
 			Width:  "100%",
-			Height: "800px",
+			Height: "100vh",
 		}),
 		charts.WithXAxisOpts(opts.XAxis{
 			AxisLabel: &opts.AxisLabel{
@@ -87,18 +105,24 @@ func CreateBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 	)
 
 	bar.AddJSFuncs(fmt.Sprintf(`
+	let option = option_%s;
+	let echart = goecharts_%s;
 	const chartDiv = document.querySelector("div.container > div.item");
-	chartDiv.style.width = "100%s";
-	chartDiv.style.height = null;
-	chartDiv.style.minHeight = "800px";
-	option_%s.grid = {
+	option.grid = {
 		containLabel: true,
 	};
-	goecharts_%s.setOption(option_%s);
+	echart.setOption(option);
 	window.addEventListener("resize", function() {
-		goecharts_%s.resize();
+		echart.resize();
 	});
-	`, "%", bar.ChartID, bar.ChartID, bar.ChartID, bar.ChartID))
+	echart.on("click", (params) => {
+		if (params.componentType === "series") {
+			const tag = encodeURIComponent(params.name);
+			const url = "https://www.nicovideo.jp/tag/%s+"+tag+"?sort=h&order=d";
+			window.open(url, '_blank');
+		}
+	});
+	`, bar.ChartID, bar.ChartID, "%E9%9F%B3MAD"))
 
 	items := make([]opts.BarData, 0)
 	for _, tag := range sortedTags {
@@ -113,23 +137,34 @@ func CreateBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 
 func CreateWordCloud(countMap map[string]int, sortedTags []string, min int) *charts.WordCloud {
 	wc := charts.NewWordCloud()
+	wc.Renderer = NewNoMarginRender(wc, wc.Validate)
 	wc.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
 		charts.WithInitializationOpts(opts.Initialization{
 			Width:  "100%",
-			Height: "650px",
+			Height: "100vh",
 		}),
 	)
 
 	wc.AddJSFuncs(fmt.Sprintf(`
+	let option = option_%s;
+	let echart = goecharts_%s;
 	const chartDiv = document.querySelector("div.container > div.item");
-	chartDiv.style.width = "100%s";
-	chartDiv.style.height = null;
-	chartDiv.style.minHeight = "650px";
+	option.grid = {
+		containLabel: true,
+	};
+	echart.setOption(option);
 	window.addEventListener("resize", function() {
-		goecharts_%s.resize();
+		echart.resize();
 	});
-	`, "%", wc.ChartID))
+	echart.on("click", (params) => {
+		if (params.componentType === "series") {
+			const tag = encodeURIComponent(params.name);
+			const url = "https://www.nicovideo.jp/tag/%s+"+tag+"?sort=h&order=d";
+			window.open(url, '_blank');
+		}
+	});
+	`, wc.ChartID, wc.ChartID, "%E9%9F%B3MAD"))
 
 	items := make([]opts.WordCloudData, 0)
 	for _, tag := range sortedTags {
@@ -143,7 +178,7 @@ func CreateWordCloud(countMap map[string]int, sortedTags []string, min int) *cha
 		SetSeriesOptions(
 			charts.WithWorldCloudChartOpts(
 				opts.WordCloudChart{
-					SizeRange: []float32{14, 80},
+					SizeRange: []float32{10, 80},
 				},
 			),
 		)
@@ -153,23 +188,38 @@ func CreateWordCloud(countMap map[string]int, sortedTags []string, min int) *cha
 
 func CreatePieChart(countMap map[string]int, sortedTags []string, maxItemCount int) *charts.Pie {
 	pie := charts.NewPie()
+	pie.Renderer = NewNoMarginRender(pie, pie.Validate)
 	pie.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
+		charts.WithTooltipOpts(opts.Tooltip{
+			Show:    true,
+			Trigger: "item",
+		}),
 		charts.WithInitializationOpts(opts.Initialization{
 			Width:  "100%",
-			Height: "1200px",
+			Height: "100vh",
 		}),
 	)
 
 	pie.AddJSFuncs(fmt.Sprintf(`
+	let option = option_%s;
+	let echart = goecharts_%s;
 	const chartDiv = document.querySelector("div.container > div.item");
-	chartDiv.style.width = "100%s";
-	chartDiv.style.height = null;
-	chartDiv.style.minHeight = "1200px";
+	option.grid = {
+		containLabel: true,
+	};
+	echart.setOption(option);
 	window.addEventListener("resize", function() {
-		goecharts_%s.resize();
+		echart.resize();
 	});
-	`, "%", pie.ChartID))
+	echart.on("click", (params) => {
+		if (params.componentType === "series") {
+			const tag = encodeURIComponent(params.name);
+			const url = "https://www.nicovideo.jp/tag/%s+"+tag+"?sort=h&order=d";
+			window.open(url, '_blank');
+		}
+	});
+	`, pie.ChartID, pie.ChartID, "%E9%9F%B3MAD"))
 
 	items := make([]opts.PieData, 0)
 	otherCount := 0
