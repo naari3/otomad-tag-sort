@@ -1,4 +1,4 @@
-package main
+package chart
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/go-echarts/go-echarts/v2/opts"
 )
 
-func createBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
+func CreateBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
@@ -26,7 +26,12 @@ func createBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 		}),
 		charts.WithInitializationOpts(opts.Initialization{
 			Width:  "100%",
-			Height: "650px",
+			Height: "800px",
+		}),
+		charts.WithXAxisOpts(opts.XAxis{
+			AxisLabel: &opts.AxisLabel{
+				Rotate: -90,
+			},
 		}),
 	)
 
@@ -34,11 +39,15 @@ func createBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 	const chartDiv = document.querySelector("div.container > div.item");
 	chartDiv.style.width = "100%s";
 	chartDiv.style.height = null;
-	chartDiv.style.minHeight = "650px";
+	chartDiv.style.minHeight = "800px";
+	option_%s.grid = {
+		containLabel: true,
+	};
+	goecharts_%s.setOption(option_%s);
 	window.addEventListener("resize", function() {
 		goecharts_%s.resize();
 	});
-	`, "%", bar.ChartID))
+	`, "%", bar.ChartID, bar.ChartID, bar.ChartID, bar.ChartID))
 
 	items := make([]opts.BarData, 0)
 	for _, tag := range sortedTags {
@@ -51,7 +60,7 @@ func createBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 	return bar
 }
 
-func createWordCloud(countMap map[string]int, sortedTags []string, min int) *charts.WordCloud {
+func CreateWordCloud(countMap map[string]int, sortedTags []string, min int) *charts.WordCloud {
 	wc := charts.NewWordCloud()
 	wc.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
@@ -91,7 +100,7 @@ func createWordCloud(countMap map[string]int, sortedTags []string, min int) *cha
 	return wc
 }
 
-func createPieChart(countMap map[string]int, sortedTags []string, maxItemCount int) *charts.Pie {
+func CreatePieChart(countMap map[string]int, sortedTags []string, maxItemCount int) *charts.Pie {
 	pie := charts.NewPie()
 	pie.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),

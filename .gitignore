@@ -1,5 +1,8 @@
 /target
 /jsonl/*
 !/jsonl/.gitkeep
+/jsonl_append/*
+!/jsonl_append/.gitkeep
 /html/*
 !/html/.gitkeep
+/bin/*
