@@ -108,8 +108,8 @@ func GetSSVideoFromIDs(IDs []string) ([]SSVideo, error) {
 		return nil, err
 	}
 	j := url.QueryEscape(string(jsonFilter))
-	// fmt.Println(fmt.Sprintf("https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q=&_sort=-startTime&fields=contentId,viewCounter,commentCounter,mylistCounter,title,description,categoryTags,tags,startTime,lengthSeconds&jsonFilter=%s", j))
-	resp, err := http.Get(fmt.Sprintf("https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q=&_sort=-startTime&fields=contentId,viewCounter,commentCounter,mylistCounter,title,description,categoryTags,tags,startTime,lengthSeconds&jsonFilter=%s", j))
+	// fmt.Printf("https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q=&_sort=-startTime&fields=contentId,viewCounter,commentCounter,mylistCounter,title,description,categoryTags,tags,startTime,lengthSeconds&jsonFilter=%s&_limit=%d\n", j, len(IDs))
+	resp, err := http.Get(fmt.Sprintf("https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q=&_sort=-startTime&fields=contentId,viewCounter,commentCounter,mylistCounter,title,description,categoryTags,tags,startTime,lengthSeconds&jsonFilter=%s&_limit=%d", j, len(IDs)))
 	if err != nil {
 		return nil, err
 	}

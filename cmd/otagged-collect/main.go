@@ -57,7 +57,7 @@ func main() {
 
 	fmt.Println("from", fetchedLastID, "to", ssVideoLastID)
 
-	ssVideos := make([]nicovideo.SSVideo, 0)
+	// ssVideos := make([]nicovideo.SSVideo, 0)
 	targetIDs := make([]string, 0)
 	idCollector, err := nicovideo.NewIDCollector(fetchedLastID)
 	if err != nil {
@@ -72,7 +72,7 @@ func main() {
 				panic(err)
 			}
 			if idNum > ssVideoLastID {
-				fmt.Println(id, ">", ssVideoLastID)
+				// fmt.Println(id, ">", ssVideoLastID)
 				finish = true
 				break
 			}
@@ -84,9 +84,21 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		ssVideos = append(ssVideos, videos...)
+		// ssVideos = append(ssVideos, videos...)
+		sort.SliceStable(videos, func(i, j int) bool {
+			a, err := videos[i].GetIDNum()
+			if err != nil {
+				panic(err)
+			}
+			b, err := videos[j].GetIDNum()
+			if err != nil {
+				panic(err)
+			}
+			return a < b
+		})
 		for _, video := range videos {
 			full := video.ToVideo()
+			fmt.Println(full.VideoID, full.Title)
 			err := full.SaveToDirectory("jsonl_append")
 			if err != nil {
 				panic(err)
@@ -96,17 +108,17 @@ func main() {
 			break
 		}
 	}
-	fmt.Println("Fetched", len(ssVideos))
+	// fmt.Println("Fetched", len(ssVideos))
 
-	sort.SliceStable(ssVideos, func(i, j int) bool {
-		a, err := ssVideos[i].GetIDNum()
-		if err != nil {
-			panic(err)
-		}
-		b, err := ssVideos[j].GetIDNum()
-		if err != nil {
-			panic(err)
-		}
-		return a < b
-	})
+	// sort.SliceStable(ssVideos, func(i, j int) bool {
+	// 	a, err := ssVideos[i].GetIDNum()
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	b, err := ssVideos[j].GetIDNum()
+	// 	if err != nil {
+	// 		panic(err)
+	// 	}
+	// 	return a < b
+	// })
 }

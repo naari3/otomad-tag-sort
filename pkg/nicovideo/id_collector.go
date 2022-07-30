@@ -57,6 +57,7 @@ func (c *IDCollector) HasNext() bool {
 			fmt.Println("Get more contents from next page", c.CurrentPage)
 			result, err := getIDsFromPage(c.CurrentPage)
 			if err != nil {
+				c.CurrentPage--
 				return false
 			}
 			if len(result.IDs) == 0 {
@@ -64,9 +65,13 @@ func (c *IDCollector) HasNext() bool {
 				c.CurrentPage++
 				result, err = getIDsFromPage(c.CurrentPage)
 				if err != nil {
+					c.CurrentPage--
+					c.CurrentPage--
 					return false
 				}
 				if len(result.IDs) == 0 {
+					c.CurrentPage--
+					c.CurrentPage--
 					return false
 				}
 			}
