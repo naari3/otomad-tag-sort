@@ -9,6 +9,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/text/unicode/norm"
+	"golang.org/x/text/width"
 )
 
 type SSVideo struct {
@@ -48,7 +51,14 @@ func (v *SSVideo) ToVideo() VideoFull {
 }
 
 func Normalize(s string) string {
-	return strings.ToLower(strings.ToUpperSpecial(kanaConv, s))
+	kana_lower := strings.ToLower(strings.ToUpperSpecial(kanaConv, s))
+	kana_lower_ex := strings.Replace(kana_lower, "！", "!", -1)
+	kana_lower_ex_ques := strings.Replace(kana_lower_ex, "？", "?", -1)
+	kana_lower_ex_ques_tilde := strings.Replace(kana_lower_ex_ques, "～", "~", -1)
+	kana_lower_ex_ques_tilde_hankana_zenkakueisuu := width.Fold.String(kana_lower_ex_ques_tilde)
+	kana_lower_ex_ques_tilde_hankana_zenkakueisuu_nfc := norm.NFC.String(kana_lower_ex_ques_tilde_hankana_zenkakueisuu)
+
+	return kana_lower_ex_ques_tilde_hankana_zenkakueisuu_nfc
 }
 
 func (v *SSVideo) NormalizedTags() []string {

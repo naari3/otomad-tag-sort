@@ -135,6 +135,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	// a, err := tc.Fetch("かわいい!")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(a)
+	// tc.SaveToFile()
 
 	err = createCharts(videos, tc)
 	if err != nil {

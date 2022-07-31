@@ -73,41 +73,51 @@ func (tc *TagCacher) FetchJSONLDir(root string) error {
 }
 
 func (tc *TagCacher) Fetch(tag string) (string, error) {
-	fetched := tc.cache[tag]
+	key := Normalize(tag)
+	fetched := tc.cache[key]
 	if fetched == "" {
-		if _, ok := tc.missedCache[tag]; ok {
+		// fmt.Println("missed", key)
+		if _, ok := tc.missedCache[key]; ok {
+			// fmt.Println("already missed", key)
 			return tag, nil
 		}
+		// fmt.Println("missed 2", key)
 
-		fmt.Println("Fetching:", tag)
-		fetchedVideo, err := GetSSVideoFromTagLimit(tag)
+		fmt.Println("Fetching:", key)
+		fetchedVideo, err := GetSSVideoFromTagLimit(key)
 		time.Sleep(time.Millisecond * 150)
 		if err != nil {
 			return "", err
 		}
 		if len(fetchedVideo) == 0 {
-			tc.missedCache[tag] = nil
+			fmt.Println("there is no", key)
+			tc.missedCache[key] = nil
 			return tag, nil
 		}
-		for _, video := range fetchedVideo {
-			newTags := strings.Split(video.Tags, " ")
-			tc.Save(newTags)
-			for _, newTag := range newTags {
-				if Normalize(newTag) == tag {
-					return newTag, nil
-				}
+		video := fetchedVideo[0]
+		newTags := strings.Split(video.Tags, " ")
+		tc.Save(newTags)
+		for _, newTag := range newTags {
+			// fmt.Println(Normalize(newTag), "==", key, Normalize(newTag) == key)
+			if Normalize(newTag) == key {
+				return newTag, nil
 			}
 		}
+
+		fmt.Println("all missed", key)
+		tc.missedCache[key] = nil
+		return tag, nil
 	}
 	return fetched, nil
 }
 
 func (tc *TagCacher) Save(tags []string) {
 	for _, tag := range tags {
-		if _, ok := tc.cache[tag]; ok {
+		if _, ok := tc.cache[Normalize(tag)]; ok {
 			continue
 		}
 		tc.cache[Normalize(tag)] = tag
+		fmt.Println("cached", Normalize(tag), "=", tag)
 	}
 }
 
