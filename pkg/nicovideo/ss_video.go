@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -44,6 +45,14 @@ func (v *SSVideo) ToVideo() VideoFull {
 		Length:      v.LengthSeconds,
 		UploadTime:  v.StartTime,
 	}
+}
+
+func Normalize(s string) string {
+	return strings.ToLower(strings.ToUpperSpecial(kanaConv, s))
+}
+
+func (v *SSVideo) NormalizedTags() []string {
+	return strings.Split(Normalize(v.Tags), " ")
 }
 
 type SSAPIResponse struct {
@@ -110,6 +119,24 @@ func GetSSVideoFromIDs(IDs []string) ([]SSVideo, error) {
 	j := url.QueryEscape(string(jsonFilter))
 	// fmt.Printf("https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q=&_sort=-startTime&fields=contentId,viewCounter,commentCounter,mylistCounter,title,description,categoryTags,tags,startTime,lengthSeconds&jsonFilter=%s&_limit=%d\n", j, len(IDs))
 	resp, err := http.Get(fmt.Sprintf("https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q=&_sort=-startTime&fields=contentId,viewCounter,commentCounter,mylistCounter,title,description,categoryTags,tags,startTime,lengthSeconds&jsonFilter=%s&_limit=%d", j, len(IDs)))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("StatusCode=%d", resp.StatusCode)
+	}
+	byteArray, _ := ioutil.ReadAll(resp.Body)
+	var sSAPIResponse SSAPIResponse
+	if err := json.Unmarshal(byteArray, &sSAPIResponse); err != nil {
+		return nil, err
+	}
+	return sSAPIResponse.Data, nil
+}
+
+func GetSSVideoFromTagLimit(tag string) ([]SSVideo, error) {
+	// fmt.Printf("https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q=%s&targets=tagsExact&_sort=-viewCounter&fields=tags&_limit=%d\n", url.QueryEscape(tag), 1)
+	resp, err := http.Get(fmt.Sprintf("https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q=%s&targets=tagsExact&_sort=-viewCounter&fields=tags&_limit=%d", url.QueryEscape(tag), 1))
 	if err != nil {
 		return nil, err
 	}

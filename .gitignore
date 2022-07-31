@@ -6,3 +6,5 @@
 # /docs/*
 # !/docs/.gitkeep
 /bin/*
+cache_tags.json
+missed_cache_tags.json

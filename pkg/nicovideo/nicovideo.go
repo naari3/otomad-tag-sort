@@ -127,7 +127,7 @@ func (v *Video) IsOtomad() bool {
 }
 
 func (v *Video) NormalizedTags() []string {
-	return strings.Split(strings.ToLower(v.Tags), " ")
+	return strings.Split(Normalize(v.Tags), " ")
 }
 
 func findJSONL(root string) []string {
@@ -166,8 +166,6 @@ func readVideoFromJSONL(file string) ([]Video, error) {
 			}
 			return nil, err
 		}
-		// 正規化 カタカナに変換
-		v.Tags = strings.ToUpperSpecial(kanaConv, v.Tags)
 		videos = append(videos, v)
 	}
 	if err != nil {

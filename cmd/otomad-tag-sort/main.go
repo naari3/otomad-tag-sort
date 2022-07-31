@@ -12,11 +12,11 @@ import (
 	"github.com/naari3/otomad-tag-sort/pkg/nicovideo"
 )
 
-func createCharts(videos []nicovideo.Video) error {
+func createCharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 	fmt.Println("Start")
 	countMap, err := nicovideo.GetCountGroupByOtomadTag(videos, nil)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	fmt.Println("Collected otomad tags:", len(countMap))
 
@@ -29,33 +29,37 @@ func createCharts(videos []nicovideo.Video) error {
 	})
 	fmt.Println("Sorted By counts")
 
-	bar := chart.CreateBarChart(countMap, sortedTags)
+	bar := chart.CreateBarChart(countMap, sortedTags, tc)
 	fbar, err := os.Create("docs/bar.html")
 	if err != nil {
 		return err
 	}
 	bar.Render(fbar)
 
-	wc := chart.CreateWordCloud(countMap, sortedTags, 5)
+	wc := chart.CreateWordCloud(countMap, sortedTags, 5, tc)
 	fwc, err := os.Create("docs/wc.html")
 	if err != nil {
 		return err
 	}
 	wc.Render(fwc)
 
-	pie := chart.CreatePieChart(countMap, sortedTags, 75)
+	pie := chart.CreatePieChart(countMap, sortedTags, 75, tc)
 	fpie, err := os.Create("docs/pie.html")
 	if err != nil {
 		return err
 	}
 	pie.Render(fpie)
 
+	err = tc.SaveToFile()
+	if err != nil {
+		return err
+	}
 	fmt.Println("End")
 
 	return nil
 }
 
-func createChartsForYear(videos []nicovideo.Video, year int) error {
+func createChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.TagCacher) error {
 	fmt.Println("Start year:", year)
 	err := os.MkdirAll("docs/"+strconv.Itoa(year), os.ModePerm)
 	if err != nil {
@@ -79,7 +83,7 @@ func createChartsForYear(videos []nicovideo.Video, year int) error {
 	})
 	fmt.Println("Sorted By counts")
 
-	bar := chart.CreateBarChart(countMap, sortedTags)
+	bar := chart.CreateBarChart(countMap, sortedTags, tc)
 	bar.Title = opts.Title{Title: "音MAD タグ分布 " + strconv.Itoa(year)}
 	fbar, err := os.Create("docs/" + strconv.Itoa(year) + "/bar.html")
 	if err != nil {
@@ -87,7 +91,7 @@ func createChartsForYear(videos []nicovideo.Video, year int) error {
 	}
 	bar.Render(fbar)
 
-	wc := chart.CreateWordCloud(countMap, sortedTags, 5)
+	wc := chart.CreateWordCloud(countMap, sortedTags, 5, tc)
 	wc.Title = opts.Title{Title: "音MAD タグ分布 " + strconv.Itoa(year)}
 	fwc, err := os.Create("docs/" + strconv.Itoa(year) + "/wc.html")
 	if err != nil {
@@ -95,7 +99,7 @@ func createChartsForYear(videos []nicovideo.Video, year int) error {
 	}
 	wc.Render(fwc)
 
-	pie := chart.CreatePieChart(countMap, sortedTags, 75)
+	pie := chart.CreatePieChart(countMap, sortedTags, 75, tc)
 	pie.Title = opts.Title{Title: "音MAD タグ分布 " + strconv.Itoa(year)}
 	fpie, err := os.Create("docs/" + strconv.Itoa(year) + "/pie.html")
 	if err != nil {
@@ -103,13 +107,16 @@ func createChartsForYear(videos []nicovideo.Video, year int) error {
 	}
 	pie.Render(fpie)
 
+	err = tc.SaveToFile()
+	if err != nil {
+		return err
+	}
 	fmt.Println("End year:", year)
 
 	return nil
 }
 
 func main() {
-	fmt.Println("Start")
 	videos, err := nicovideo.ReadAllVideoFromDirectory("jsonl")
 	if err != nil {
 		panic(err)
@@ -124,13 +131,18 @@ func main() {
 
 	videos = append(videos, append_videos...)
 
-	err = createCharts(videos)
+	tc, err := nicovideo.NewTagCacher("cache_tags.json", "missed_cache_tags.json")
+	if err != nil {
+		panic(err)
+	}
+
+	err = createCharts(videos, tc)
 	if err != nil {
 		panic(err)
 	}
 
 	for year := 2007; year <= time.Now().Year(); year++ {
-		err = createChartsForYear(videos, year)
+		err = createChartsForYear(videos, year, tc)
 		if err != nil {
 			panic(err)
 		}

@@ -9,6 +9,7 @@ import (
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/go-echarts/go-echarts/v2/render"
 	tpls "github.com/go-echarts/go-echarts/v2/templates"
+	"github.com/naari3/otomad-tag-sort/pkg/nicovideo"
 )
 
 var HeaderTpl = `
@@ -75,7 +76,7 @@ func (r *noMarginRender) Render(w io.Writer) error {
 	return err
 }
 
-func CreateBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
+func CreateBarChart(countMap map[string]int, sortedTags []string, tc *nicovideo.TagCacher) *charts.Bar {
 	bar := charts.NewBar()
 	bar.Renderer = NewNoMarginRender(bar, bar.Validate)
 	bar.SetGlobalOptions(
@@ -129,13 +130,26 @@ func CreateBarChart(countMap map[string]int, sortedTags []string) *charts.Bar {
 		items = append(items, opts.BarData{Value: countMap[tag]})
 	}
 
-	bar.SetXAxis(sortedTags).
+	namedSortedTags := make([]string, 0)
+	for _, tag := range sortedTags {
+		fetchedTag, err := tc.Fetch(tag)
+		if err == nil {
+			if fetchedTag != "" {
+				tag = fetchedTag
+			}
+		}
+		// otherwise ignored
+
+		namedSortedTags = append(namedSortedTags, tag)
+	}
+
+	bar.SetXAxis(namedSortedTags).
 		AddSeries("タグ", items)
 
 	return bar
 }
 
-func CreateWordCloud(countMap map[string]int, sortedTags []string, min int) *charts.WordCloud {
+func CreateWordCloud(countMap map[string]int, sortedTags []string, min int, tc *nicovideo.TagCacher) *charts.WordCloud {
 	wc := charts.NewWordCloud()
 	wc.Renderer = NewNoMarginRender(wc, wc.Validate)
 	wc.SetGlobalOptions(
@@ -171,7 +185,15 @@ func CreateWordCloud(countMap map[string]int, sortedTags []string, min int) *cha
 		if countMap[tag] < min {
 			break
 		}
-		items = append(items, opts.WordCloudData{Name: tag, Value: countMap[tag]})
+		namedTag := tag
+		fetchedTag, err := tc.Fetch(tag)
+		if err == nil {
+			if fetchedTag != "" {
+				namedTag = fetchedTag
+			}
+		}
+
+		items = append(items, opts.WordCloudData{Name: namedTag, Value: countMap[tag]})
 	}
 
 	wc.AddSeries("タグ", items).
@@ -186,7 +208,7 @@ func CreateWordCloud(countMap map[string]int, sortedTags []string, min int) *cha
 	return wc
 }
 
-func CreatePieChart(countMap map[string]int, sortedTags []string, maxItemCount int) *charts.Pie {
+func CreatePieChart(countMap map[string]int, sortedTags []string, maxItemCount int, tc *nicovideo.TagCacher) *charts.Pie {
 	pie := charts.NewPie()
 	pie.Renderer = NewNoMarginRender(pie, pie.Validate)
 	pie.SetGlobalOptions(
@@ -230,7 +252,15 @@ func CreatePieChart(countMap map[string]int, sortedTags []string, maxItemCount i
 			otherCount++
 			continue
 		}
-		items = append(items, opts.PieData{Name: tag, Value: countMap[tag]})
+		namedTag := tag
+		fetchedTag, err := tc.Fetch(tag)
+		if err == nil {
+			if fetchedTag != "" {
+				namedTag = fetchedTag
+			}
+		}
+
+		items = append(items, opts.PieData{Name: namedTag, Value: countMap[tag]})
 		currentCount++
 	}
 	items = append(items, opts.PieData{Name: "", Value: otherCount})
