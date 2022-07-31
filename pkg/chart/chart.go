@@ -80,7 +80,7 @@ func CreateBarChart(countMap map[string]int, sortedTags []string, tc *nicovideo.
 	bar := charts.NewBar()
 	bar.Renderer = NewNoMarginRender(bar, bar.Validate)
 	bar.SetGlobalOptions(
-		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
+		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ頒布"}),
 		charts.WithTooltipOpts(opts.Tooltip{
 			Show:    true,
 			Trigger: "axis",
@@ -153,7 +153,7 @@ func CreateWordCloud(countMap map[string]int, sortedTags []string, min int, tc *
 	wc := charts.NewWordCloud()
 	wc.Renderer = NewNoMarginRender(wc, wc.Validate)
 	wc.SetGlobalOptions(
-		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
+		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ頒布"}),
 		charts.WithInitializationOpts(opts.Initialization{
 			Width:  "100%",
 			Height: "100vh",
@@ -212,7 +212,7 @@ func CreatePieChart(countMap map[string]int, sortedTags []string, maxItemCount i
 	pie := charts.NewPie()
 	pie.Renderer = NewNoMarginRender(pie, pie.Validate)
 	pie.SetGlobalOptions(
-		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ分布"}),
+		charts.WithTitleOpts(opts.Title{Title: "音MAD タグ頒布"}),
 		charts.WithTooltipOpts(opts.Tooltip{
 			Show:    true,
 			Trigger: "item",
