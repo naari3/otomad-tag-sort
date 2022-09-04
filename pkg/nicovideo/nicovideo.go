@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -14,6 +15,8 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/jmoiron/sqlx"
+	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -57,19 +60,19 @@ var kanaConv = unicode.SpecialCase{
 }
 
 type VideoFull struct {
-	VideoID     string    `json:"video_id"`
-	WatchNum    int       `json:"watch_num"`
-	CommentNum  string    `json:"comment_num"`
-	MylistNum   int       `json:"mylist_num"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Category    string    `json:"category"`
-	Tags        string    `json:"tags"`
-	UploadTime  time.Time `json:"upload_time"`
-	FileType    string    `json:"file_type"`
-	Length      int       `json:"length"`
-	SizeHigh    int       `json:"size_high"`
-	SizeLow     int       `json:"size_low"`
+	VideoID     string    `json:"video_id" db:"video_id"`
+	WatchNum    int       `json:"watch_num" db:"watch_num"`
+	CommentNum  string    `json:"comment_num" db:"comment_num"`
+	MylistNum   int       `json:"mylist_num" db:"mylist_num"`
+	Title       string    `json:"title" db:"title"`
+	Description string    `json:"description" db:"description"`
+	Category    string    `json:"category" db:"category"`
+	Tags        string    `json:"tags" db:"tags"`
+	UploadTime  time.Time `json:"upload_time" db:"upload_time"`
+	FileType    string    `json:"file_type" db:"file_type"`
+	Length      int       `json:"length" db:"length"`
+	SizeHigh    int       `json:"size_high" db:"size_high"`
+	SizeLow     int       `json:"size_low" db:"size_low"`
 }
 
 func (v *VideoFull) GetIDNum() (int, error) {
@@ -98,15 +101,15 @@ func (v *VideoFull) SaveToDirectory(dir string) error {
 }
 
 type Video struct {
-	VideoID string `json:"video_id"`
+	VideoID string `json:"video_id" db:"video_id"`
 	// WatchNum    int    `json:"watch_num"`
 	// CommentNum  string `json:"comment_num"`
 	// MylistNum   int    `json:"mylist_num"`
 	// Title       string `json:"title"`
 	// Description string `json:"description"`
 	// Category    string `json:"category"`
-	Tags       string    `json:"tags"`
-	UploadTime time.Time `json:"upload_time"`
+	Tags       string    `json:"tags" db:"tags"`
+	UploadTime time.Time `json:"upload_time" db:"upload_time"`
 	// FileType    string `json:"file_type"`
 	// Length      int    `json:"length"`
 	// SizeHigh    int    `json:"size_high"`
@@ -298,7 +301,7 @@ func GetCountGroupByOtomadTag(videos []Video, filter func(video Video) bool) (ma
 			}
 
 			for _, tag := range tags {
-				if tag == "音MAD" || tag == "音mad" {
+				if tag == "音mad" {
 					return nil
 				}
 				mutex.Lock()
@@ -310,6 +313,87 @@ func GetCountGroupByOtomadTag(videos []Video, filter func(video Video) bool) (ma
 	}
 	if err := eg.Wait(); err != nil {
 		return nil, err
+	}
+	return counts, nil
+}
+
+func GetCountGroupByTargets(videos []Video, targets []string, filter func(video Video) bool) (map[string]int, error) {
+	counts := make(map[string]int)
+
+	eg := errgroup.Group{}
+	mutex := sync.Mutex{}
+	for _, v := range videos {
+		v := v
+		eg.Go(func() error {
+			if filter != nil && !filter(v) {
+				return nil
+			}
+			tags := v.NormalizedTags()
+
+			for _, tag := range tags {
+				isTarget := false
+				for _, target := range targets {
+					if tag == Normalize(target) {
+						isTarget = true
+						break
+					}
+				}
+				if !isTarget {
+					continue
+				}
+				mutex.Lock()
+				counts[tag]++
+				mutex.Unlock()
+			}
+			return nil
+		})
+	}
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
+	return counts, nil
+}
+
+func GetCountGroupByTargetsWithDB(targets []string) (map[string]int, error) {
+	db, err := sqlx.Open("sqlite3", "./niconico.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	counts := make(map[string]int)
+	for _, target := range targets {
+		target := Normalize(target)
+		var count int
+		err := db.Get(&count, "select count(*) from video_tags where tag_id in (select id from tags where tag = ?)", target)
+		if err != nil {
+			return nil, err
+		}
+		counts[target] = count
+	}
+	return counts, nil
+}
+
+func GetCountGroupByTargetsWithDBForYear(targets []string, year int) (map[string]int, error) {
+	db, err := sqlx.Open("sqlite3", "./niconico.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	counts := make(map[string]int)
+	for _, target := range targets {
+		target := Normalize(target)
+		var count int
+		err := db.Get(&count, `
+		select count(*) from video_tags inner join videos on video_tags.video_id = videos.video_id
+			where tag_id in (select id from tags where tag = ?) and
+				? <= videos.upload_time and videos.upload_time < ?`,
+			target, fmt.Sprintf("%d-01-01", year), fmt.Sprintf("%d-01-01", year+1))
+		if err != nil {
+			return nil, err
+		}
+		counts[target] = count
 	}
 	return counts, nil
 }

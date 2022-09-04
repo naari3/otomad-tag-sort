@@ -76,7 +76,11 @@ func (r *noMarginRender) Render(w io.Writer) error {
 	return err
 }
 
-func CreateBarChart(countMap map[string]int, sortedTags []string, tc *nicovideo.TagCacher) *charts.Bar {
+type Number interface {
+	int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | uintptr | float32 | float64
+}
+
+func CreateBarChart[T Number](countMap map[string]T, sortedTags []string, tc *nicovideo.TagCacher) *charts.Bar {
 	bar := charts.NewBar()
 	bar.Renderer = NewNoMarginRender(bar, bar.Validate)
 	bar.SetGlobalOptions(
@@ -149,7 +153,7 @@ func CreateBarChart(countMap map[string]int, sortedTags []string, tc *nicovideo.
 	return bar
 }
 
-func CreateWordCloud(countMap map[string]int, sortedTags []string, min int, tc *nicovideo.TagCacher) *charts.WordCloud {
+func CreateWordCloud[T Number](countMap map[string]T, sortedTags []string, min T, tc *nicovideo.TagCacher) *charts.WordCloud {
 	wc := charts.NewWordCloud()
 	wc.Renderer = NewNoMarginRender(wc, wc.Validate)
 	wc.SetGlobalOptions(
@@ -208,7 +212,7 @@ func CreateWordCloud(countMap map[string]int, sortedTags []string, min int, tc *
 	return wc
 }
 
-func CreatePieChart(countMap map[string]int, sortedTags []string, maxItemCount int, tc *nicovideo.TagCacher) *charts.Pie {
+func CreatePieChart[T Number](countMap map[string]T, sortedTags []string, maxItemCount int, tc *nicovideo.TagCacher) *charts.Pie {
 	pie := charts.NewPie()
 	pie.Renderer = NewNoMarginRender(pie, pie.Validate)
 	pie.SetGlobalOptions(
