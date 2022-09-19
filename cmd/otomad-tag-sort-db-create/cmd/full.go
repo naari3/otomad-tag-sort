@@ -3,6 +3,8 @@ package cmd
 import (
 	"log"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/naari3/otomad-tag-sort/pkg/nicovideo"
@@ -26,7 +28,8 @@ var schema = `
 create table videos (
 	video_id text not null primary key,
 	tags text,
-	upload_time text
+	upload_time text,
+	upload_year integer
 );
 create index videos_upload_time on videos(upload_time);
 
@@ -44,6 +47,17 @@ create table tags (
 );
 create index tags_tag on tags(tag);
 `
+
+type Video struct {
+	VideoID    string    `db:"video_id"`
+	Tags       string    `db:"tags"`
+	UploadTime time.Time `db:"upload_time"`
+	UploadYear int       `db:"upload_year"`
+}
+
+func (v *Video) NormalizedTags() []string {
+	return strings.Split(nicovideo.Normalize(v.Tags), " ")
+}
 
 func runFull() error {
 	if err := os.Remove("niconico.db"); err != nil {
@@ -78,12 +92,17 @@ func runFull() error {
 	log.Println("Collected all append_videos:", len(append_videos))
 
 	videos = append(videos, append_videos...)
-	unique_video_map := make(map[string]nicovideo.Video)
+	unique_video_map := make(map[string]Video)
 	for _, v := range videos {
 		if _, ok := unique_video_map[v.VideoID]; ok {
 			continue
 		}
-		unique_video_map[v.VideoID] = v
+		unique_video_map[v.VideoID] = Video{
+			VideoID:    v.VideoID,
+			Tags:       v.Tags,
+			UploadTime: v.UploadTime,
+			UploadYear: v.UploadTime.Year(),
+		}
 	}
 	log.Println("Collected all unique videos:", len(unique_video_map))
 	tagID := 0
@@ -128,7 +147,7 @@ func runFull() error {
 	log.Println("Inserted all tags")
 
 	videoBufSize := 300
-	bufVideo := make([]nicovideo.Video, 0, videoBufSize)
+	bufVideo := make([]Video, 0, videoBufSize)
 	videoCount := 0
 	videoTagIDsMap := make(map[string][]int)
 	for _, v := range unique_video_map {
@@ -146,7 +165,7 @@ func runFull() error {
 		videoTagIDsMap[v.VideoID] = tagIDs
 
 		if len(bufVideo) == videoBufSize {
-			_, err = db.NamedExec(`insert into videos(video_id, tags, upload_time) values(:video_id, :tags, :upload_time)`, bufVideo)
+			_, err = db.NamedExec(`insert into videos(video_id, tags, upload_time, upload_year) values(:video_id, :tags, :upload_time, :upload_year)`, bufVideo)
 			if err != nil {
 				log.Fatal(err)
 			}
