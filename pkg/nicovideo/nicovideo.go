@@ -382,18 +382,29 @@ func GetCountGroupByTargetsWithDBForYear(targets []string, year int) (map[string
 	defer db.Close()
 
 	counts := make(map[string]int)
+	eg := errgroup.Group{}
+	mutex := sync.Mutex{}
 	for _, target := range targets {
 		target := Normalize(target)
-		var count int
-		err := db.Get(&count, `
+		eg.Go(func() error {
+			var count int
+			err := db.Get(&count, `
 		select count(*) from video_tags inner join videos on video_tags.video_id = videos.video_id
 			where tag_id in (select id from tags where tag = ?) and
 				? <= videos.upload_time and videos.upload_time < ?`,
-			target, fmt.Sprintf("%d-01-01", year), fmt.Sprintf("%d-01-01", year+1))
-		if err != nil {
+				target, fmt.Sprintf("%d-01-01", year), fmt.Sprintf("%d-01-01", year+1))
+			if err != nil {
+				return err
+			}
+			mutex.Lock()
+			counts[target] = count
+			mutex.Unlock()
+			return nil
+		})
+		if err := eg.Wait(); err != nil {
 			return nil, err
 		}
-		counts[target] = count
+
 	}
 	return counts, nil
 }
