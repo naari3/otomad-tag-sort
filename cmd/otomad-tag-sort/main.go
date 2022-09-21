@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime/pprof"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-echarts/go-echarts/v2/opts"
@@ -137,6 +139,7 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 
 	MIs := make(map[string]float32, 0)
 	for tag := range countMap {
+		strings.Contains(tag, "音MAD")
 		if countMap[tag] != allCountMap[tag] {
 			mi := float32(countMap[tag]) / float32(allCountMap[tag])
 			MIs[tag] = mi
@@ -153,6 +156,7 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 	fmt.Println("Sorted By MI")
 
 	bar := chart.CreateBarChart(MIs, sortedTags, tc)
+	bar.Title = opts.Title{Title: "音MAD タグ 相互情報量"}
 	fbar, err := os.Create("docs/mibar.html")
 	if err != nil {
 		return err
@@ -160,6 +164,7 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 	bar.Render(fbar)
 
 	wc := chart.CreateWordCloud(MIs, sortedTags, 0, tc)
+	wc.Title = opts.Title{Title: "音MAD タグ 相互情報量"}
 	fwc, err := os.Create("docs/miwc.html")
 	if err != nil {
 		return err
@@ -167,6 +172,7 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 	wc.Render(fwc)
 
 	pie := chart.CreatePieChart(MIs, sortedTags, 75, tc)
+	pie.Title = opts.Title{Title: "音MAD タグ 相互情報量"}
 	fpie, err := os.Create("docs/mipie.html")
 	if err != nil {
 		return err
@@ -225,7 +231,7 @@ func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.Tag
 	fmt.Println("Sorted By MI")
 
 	bar := chart.CreateBarChart(MIs, sortedTags, tc)
-	bar.Title = opts.Title{Title: "音MAD タグ頒布 " + strconv.Itoa(year)}
+	bar.Title = opts.Title{Title: "音MAD タグ 相互情報量 " + strconv.Itoa(year)}
 	fbar, err := os.Create("docs/" + strconv.Itoa(year) + "/mibar.html")
 	if err != nil {
 		return err
@@ -233,7 +239,7 @@ func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.Tag
 	bar.Render(fbar)
 
 	wc := chart.CreateWordCloud(MIs, sortedTags, 0, tc)
-	wc.Title = opts.Title{Title: "音MAD タグ頒布 " + strconv.Itoa(year)}
+	wc.Title = opts.Title{Title: "音MAD タグ 相互情報量 " + strconv.Itoa(year)}
 	fwc, err := os.Create("docs/" + strconv.Itoa(year) + "/miwc.html")
 	if err != nil {
 		return err
@@ -241,7 +247,7 @@ func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.Tag
 	wc.Render(fwc)
 
 	pie := chart.CreatePieChart(MIs, sortedTags, 75, tc)
-	pie.Title = opts.Title{Title: "音MAD タグ頒布 " + strconv.Itoa(year)}
+	pie.Title = opts.Title{Title: "音MAD タグ 相互情報量 " + strconv.Itoa(year)}
 	fpie, err := os.Create("docs/" + strconv.Itoa(year) + "/mipie.html")
 	if err != nil {
 		return err
@@ -258,6 +264,16 @@ func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.Tag
 }
 
 func main() {
+	f, err := os.Create("cpu" + strconv.Itoa(int(time.Now().Unix())) + ".pprof")
+	if err != nil {
+		panic(err)
+	}
+
+	if err := pprof.StartCPUProfile(f); err != nil {
+		panic(err)
+	}
+	defer pprof.StopCPUProfile()
+
 	videos, err := nicovideo.ReadAllVideoFromDirectory("jsonl")
 	if err != nil {
 		panic(err)
@@ -276,12 +292,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	// a, err := tc.Fetch("かわいい!")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Println(a)
-	// tc.SaveToFile()
+	a, err := tc.Fetch("かわいい!")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(a)
+	tc.SaveToFile()
 
 	err = createCharts(videos, tc)
 	if err != nil {

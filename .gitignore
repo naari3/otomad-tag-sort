@@ -9,3 +9,4 @@
 cache_tags.json
 missed_cache_tags.json
 niconico.db
+*.pprof
