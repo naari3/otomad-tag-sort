@@ -6,7 +6,6 @@ import (
 	"runtime/pprof"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-echarts/go-echarts/v2/opts"
@@ -68,9 +67,7 @@ func createChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.TagCa
 		return err
 	}
 
-	countMap, err := nicovideo.GetCountGroupByOtomadTag(videos, func(video nicovideo.Video) bool {
-		return video.UploadTime.Year() == year
-	})
+	countMap, err := nicovideo.GetCountGroupByOtomadTag(videos, func(video nicovideo.Video) bool { return video.UploadTime.Year() == year })
 	if err != nil {
 		return err
 	}
@@ -120,7 +117,7 @@ func createChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.TagCa
 
 func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 	fmt.Println("Start")
-	countMap, err := nicovideo.GetCountGroupByOtomadTag(videos, nil)
+	countMap, err := nicovideo.GetCountGroupByOtomadTag(videos, func(video nicovideo.Video) bool { return true })
 	if err != nil {
 		return err
 	}
@@ -139,11 +136,14 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 
 	MIs := make(map[string]float32, 0)
 	for tag := range countMap {
-		strings.Contains(tag, "音MAD")
-		if countMap[tag] != allCountMap[tag] {
-			mi := float32(countMap[tag]) / float32(allCountMap[tag])
-			MIs[tag] = mi
+		if allCountMap[tag] == 0 {
+			continue
 		}
+		if countMap[tag] == allCountMap[tag] {
+			continue
+		}
+		mi := float32(countMap[tag]) / float32(allCountMap[tag])
+		MIs[tag] = mi
 	}
 
 	sortedTags := make([]string, 0, len(MIs))
@@ -190,9 +190,7 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 
 func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.TagCacher) error {
 	fmt.Println("Start")
-	countMap, err := nicovideo.GetCountGroupByOtomadTag(videos, func(video nicovideo.Video) bool {
-		return video.UploadTime.Year() == year
-	})
+	countMap, err := nicovideo.GetCountGroupByOtomadTag(videos, func(video nicovideo.Video) bool { return video.UploadTime.Year() == year })
 	if err != nil {
 		return err
 	}
@@ -292,12 +290,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	a, err := tc.Fetch("かわいい!")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(a)
-	tc.SaveToFile()
 
 	err = createCharts(videos, tc)
 	if err != nil {
@@ -318,5 +310,8 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+	}
+	if err := tc.SaveToFile(); err != nil {
+		panic(err)
 	}
 }

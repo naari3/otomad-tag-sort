@@ -317,6 +317,113 @@ func GetCountGroupByOtomadTag(videos []Video, filter func(video Video) bool) (ma
 	return counts, nil
 }
 
+func GetCountGroupByOtomadTagWithDB(year int) (map[string]int, error) {
+	db, err := sqlx.Open("sqlite3", "./niconico.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	counts := make(map[string]int)
+
+	otomadTagID := 0
+	err = db.Get(&otomadTagID, "select id from tags where tag = ?", "音mad")
+	if err != nil {
+		return nil, err
+	}
+
+	otomadRelatedTagIDs := make([]int, 0)
+	err = db.Select(&otomadRelatedTagIDs, `select distinct tag_id from video_tags where video_id in (select video_id from video_tags where tag_id = ?)`, otomadTagID)
+	if err != nil {
+		return nil, err
+	}
+
+	otomadRelatedTagMap := make(map[int]string, 0)
+	revOtomadRelatedTagMap := make(map[string]int, 0)
+	bufferSize := 1000
+	otomadRelatedTagIDsBuffer := make([]int, 0)
+	for _, tagID := range otomadRelatedTagIDs {
+		otomadRelatedTagIDsBuffer = append(otomadRelatedTagIDsBuffer, tagID)
+		if len(otomadRelatedTagIDsBuffer) == bufferSize {
+			query, args, err := sqlx.In("select id, tag from tags where id in (?)", otomadRelatedTagIDsBuffer)
+			if err != nil {
+				return nil, err
+			}
+			rows, err := db.Queryx(query, args...)
+			for rows.Next() {
+				var id int
+				var tag string
+				err = rows.Scan(&id, &tag)
+				if err != nil {
+					return nil, err
+				}
+				otomadRelatedTagMap[id] = tag
+				revOtomadRelatedTagMap[tag] = id
+			}
+			if err != nil {
+				return nil, err
+			}
+			otomadRelatedTagIDsBuffer = make([]int, 0)
+		}
+	}
+	if len(otomadRelatedTagIDsBuffer) > 0 {
+		query, args, err := sqlx.In("select id, tag from tags where id in (?)", otomadRelatedTagIDsBuffer)
+		if err != nil {
+			return nil, err
+		}
+		rows, err := db.Queryx(query, args...)
+		for rows.Next() {
+			var id int
+			var tag string
+			err = rows.Scan(&id, &tag)
+			if err != nil {
+				return nil, err
+			}
+			otomadRelatedTagMap[id] = tag
+			revOtomadRelatedTagMap[tag] = id
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	otomadVideoIDs := make([]string, 0)
+	err = db.Select(&otomadVideoIDs, `select video_id from video_tags where tag_id = ?`, otomadTagID)
+	if err != nil {
+		return nil, err
+	}
+
+	// eg := errgroup.Group{}
+	// mutex := sync.Mutex{}
+	for _, tID := range otomadRelatedTagIDs {
+		if tID == otomadTagID {
+			continue
+		}
+		tID2 := tID
+		// eg.Go(func() error {
+		videoIDs := make([]string, 0)
+		if year != 0 {
+			err = db.Select(&videoIDs, `select video_id from video_tags where tag_id = ?  and ? <= upload_time and upload_time < ?`,
+				tID2, fmt.Sprintf("%d-01-01", year), fmt.Sprintf("%d-01-01", year+1))
+		} else {
+			err = db.Select(&videoIDs, `select video_id from video_tags where tag_id = ?`, tID2)
+		}
+		if err != nil {
+			return nil, err
+		}
+		// mutex.Lock()
+		count := len(intersection(otomadVideoIDs, videoIDs))
+		counts[otomadRelatedTagMap[tID2]] = count
+		// mutex.Unlock()
+		// return nil
+		// })
+	}
+	// if err := eg.Wait(); err != nil {
+	// 	return nil, err
+	// }
+	return counts, nil
+}
+
 func GetCountGroupByTargets(videos []Video, targets []string, filter func(video Video) bool) (map[string]int, error) {
 	counts := make(map[string]int)
 
@@ -374,6 +481,30 @@ func GetCountGroupByTargetsWithDB(targets []string) (map[string]int, error) {
 	return counts, nil
 }
 
+func intersection(l1, l2 []string) []string {
+	s := make(map[string]struct{}, len(l1))
+
+	// list1をmap形式に変換
+	for _, data := range l1 {
+		// struct{}{}何もない空のデータ
+		s[data] = struct{}{}
+	}
+
+	r := make([]string, 0, len(l1))
+
+	for _, data := range l2 {
+		// mapにデータがない場合は、スキップ
+		// okにはデータの存在有無true/falseで入る
+		if _, ok := s[data]; !ok {
+			continue
+		}
+
+		// 積集合のデータを格納
+		r = append(r, data)
+	}
+	return r
+}
+
 func GetCountGroupByTargetsWithDBForYear(targets []string, year int) (map[string]int, error) {
 	db, err := sqlx.Open("sqlite3", "./niconico.db")
 	if err != nil {
@@ -389,9 +520,8 @@ func GetCountGroupByTargetsWithDBForYear(targets []string, year int) (map[string
 		eg.Go(func() error {
 			var count int
 			err := db.Get(&count, `
-		select count(*) from video_tags inner join videos on video_tags.video_id = videos.video_id
-			where tag_id in (select id from tags where tag = ?) and
-				? <= videos.upload_time and videos.upload_time < ?`,
+		select count(*) from video_tags where tag_id in (select id from tags where tag = ?) and
+				? <= upload_time and upload_time < ?`,
 				target, fmt.Sprintf("%d-01-01", year), fmt.Sprintf("%d-01-01", year+1))
 			if err != nil {
 				return err

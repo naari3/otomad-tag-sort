@@ -2,13 +2,15 @@ package cmd
 
 import (
 	"log"
-	"os"
 	"strings"
 	"time"
 
+	"github.com/cheggaaa/pb/v3"
 	"github.com/jmoiron/sqlx"
 	"github.com/naari3/otomad-tag-sort/pkg/nicovideo"
 	"github.com/spf13/cobra"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
@@ -24,6 +26,12 @@ var fullCmd = &cobra.Command{
 	},
 }
 
+var drop = `
+drop table if exists videos;
+drop table if exists video_tags;
+drop table if exists tags;
+`
+
 var schema = `
 create table videos (
 	video_id text not null primary key,
@@ -36,10 +44,12 @@ create index videos_upload_time on videos(upload_time);
 create table video_tags (
 	id integer not null primary key autoincrement,
 	video_id text not null,
-	tag_id integer not null
+	tag_id integer not null,
+	upload_time text
 );
 create index video_tags_video_id on video_tags(video_id);
 create index video_tags_tag_id on video_tags(tag_id);
+create index video_tags_upload_time on video_tags(upload_time);
 
 create table tags (
 	id integer not null primary key autoincrement,
@@ -52,7 +62,6 @@ type Video struct {
 	VideoID    string    `db:"video_id"`
 	Tags       string    `db:"tags"`
 	UploadTime time.Time `db:"upload_time"`
-	UploadYear int       `db:"upload_year"`
 }
 
 func (v *Video) NormalizedTags() []string {
@@ -60,23 +69,20 @@ func (v *Video) NormalizedTags() []string {
 }
 
 func runFull() error {
-	if err := os.Remove("niconico.db"); err != nil {
-		log.Fatal(err)
-	}
 	db, err := sqlx.Open("sqlite3", "./niconico.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	_, err = db.Exec(schema)
+	_, err = db.Exec(drop)
 	if err != nil {
-		log.Printf("%q: %s\n", err, schema)
+		log.Fatalf("%q: %s\n", err, drop)
 	}
 
-	_, err = db.Exec(`delete from videos;`)
+	_, err = db.Exec(schema)
 	if err != nil {
-		log.Printf("%q: %s\n", err, schema)
+		log.Fatalf("%q: %s\n", err, schema)
 	}
 
 	videos, err := nicovideo.ReadAllVideoFromDirectory("jsonl")
@@ -92,30 +98,27 @@ func runFull() error {
 	log.Println("Collected all append_videos:", len(append_videos))
 
 	videos = append(videos, append_videos...)
-	unique_video_map := make(map[string]Video)
+	uniqueVideoMap := make(map[string]Video)
 	for _, v := range videos {
-		if _, ok := unique_video_map[v.VideoID]; ok {
+		if _, ok := uniqueVideoMap[v.VideoID]; ok {
 			continue
 		}
-		unique_video_map[v.VideoID] = Video{
+		uniqueVideoMap[v.VideoID] = Video{
 			VideoID:    v.VideoID,
 			Tags:       v.Tags,
 			UploadTime: v.UploadTime,
-			UploadYear: v.UploadTime.Year(),
 		}
 	}
-	log.Println("Collected all unique videos:", len(unique_video_map))
-	tagID := 0
-	tagIDMap := make(map[string]int)
-	for _, v := range unique_video_map {
+	log.Println("Collected all unique videos:", len(uniqueVideoMap))
+	tagMap := make(map[string]struct{})
+	for _, v := range uniqueVideoMap {
 		for _, t := range v.NormalizedTags() {
-			if _, ok := tagIDMap[t]; !ok {
-				tagIDMap[t] = tagID
-				tagID++
+			if _, ok := tagMap[t]; !ok {
+				tagMap[t] = struct{}{}
 			}
 		}
 	}
-	log.Println("Collected all unique tags:", len(tagIDMap))
+	log.Println("Collected all unique tags:", len(tagMap))
 
 	type Tag struct {
 		ID  int    `db:"id"`
@@ -123,37 +126,53 @@ func runFull() error {
 	}
 	tagsBufSize := 400
 	bufTags := make([]Tag, 0, tagsBufSize)
-	tagCount := 0
-	for t := range tagIDMap {
-		if tagCount > tagsBufSize && tagCount%100000 == 0 {
-			log.Println("Processing", tagCount, "tags")
-		}
-		bufTags = append(bufTags, Tag{ID: tagIDMap[t], Tag: t})
+	tagInsertBar := pb.StartNew(len(tagMap))
+	for t := range tagMap {
+		bufTags = append(bufTags, Tag{Tag: t})
 		if len(bufTags) == tagsBufSize {
-			_, err = db.NamedExec(`insert into tags(id, tag) values(:id, :tag)`, bufTags)
+			_, err = db.NamedExec(`insert into tags(tag) values(:tag)`, bufTags)
 			if err != nil {
 				log.Fatal(err)
 			}
 			bufTags = bufTags[:0]
+			tagInsertBar.Add(tagsBufSize)
 		}
-		tagCount++
 	}
 	if len(bufTags) > 0 {
-		_, err = db.NamedExec(`insert into tags(id, tag) values(:id, :tag)`, bufTags)
+		_, err = db.NamedExec(`insert into tags(tag) values(:tag)`, bufTags)
 		if err != nil {
 			log.Fatal(err)
 		}
+		tagInsertBar.Add(len(bufTags))
 	}
+	tagInsertBar.Finish()
 	log.Println("Inserted all tags")
+	log.Println("Create tag id map")
+	tagMapBar := pb.StartNew(len(tagMap))
+	tagIDMap := make(map[string]int)
+	rows, err := db.Queryx(`select id, tag from tags`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for rows.Next() {
+		var id int
+		var tag string
+		err = rows.Scan(&id, &tag)
+		if err != nil {
+			log.Fatal(err)
+		}
+		tagIDMap[tag] = id
+		tagMapBar.Increment()
+	}
+	tagMapBar.Finish()
+	log.Println("Created tag id map")
 
 	videoBufSize := 300
 	bufVideo := make([]Video, 0, videoBufSize)
-	videoCount := 0
 	videoTagIDsMap := make(map[string][]int)
-	for _, v := range unique_video_map {
-		if videoCount > 0 && videoCount%100000 == 0 {
-			log.Println("Processing", videoCount, "videos")
-		}
+	videoTagsCount := 0
+	videoInsertBar := pb.StartNew(len(uniqueVideoMap))
+	for _, v := range uniqueVideoMap {
 		bufVideo = append(bufVideo, v)
 		if _, ok := videoTagIDsMap[v.VideoID]; !ok {
 			videoTagIDsMap[v.VideoID] = make([]int, 0)
@@ -161,55 +180,57 @@ func runFull() error {
 		tagIDs := make([]int, 0, len(v.NormalizedTags()))
 		for _, t := range v.NormalizedTags() {
 			tagIDs = append(tagIDs, tagIDMap[t])
+			videoTagsCount++
 		}
 		videoTagIDsMap[v.VideoID] = tagIDs
 
 		if len(bufVideo) == videoBufSize {
-			_, err = db.NamedExec(`insert into videos(video_id, tags, upload_time, upload_year) values(:video_id, :tags, :upload_time, :upload_year)`, bufVideo)
+			_, err = db.NamedExec(`insert into videos(video_id, tags, upload_time) values(:video_id, :tags, :upload_time)`, bufVideo)
 			if err != nil {
 				log.Fatal(err)
 			}
 			bufVideo = bufVideo[:0]
+			videoInsertBar.Add(videoBufSize)
 		}
-		videoCount++
 	}
 	if len(bufVideo) > 0 {
 		_, err = db.NamedExec(`insert into videos(video_id, tags, upload_time) values(:video_id, :tags, :upload_time)`, bufVideo)
 		if err != nil {
 			log.Fatal(err)
 		}
+		videoInsertBar.Add(len(bufVideo))
 	}
+	videoInsertBar.Finish()
 	log.Println("Inserted all videos")
 	log.Println("Collected all video_tags:", len(videoTagIDsMap))
 
 	type VideoTag struct {
-		ID      int    `db:"id"`
-		VideoID string `db:"video_id"`
-		TagID   int    `db:"tag_id"`
+		ID         int       `db:"id"`
+		VideoID    string    `db:"video_id"`
+		TagID      int       `db:"tag_id"`
+		UploadTime time.Time `db:"upload_time"`
 	}
 
 	videoTagBufSize := 400
 	bufVideoTag := make([]VideoTag, 0, videoTagBufSize)
-	videoTagCount := 0
+	videoTagInsertBar := pb.StartNew(videoTagsCount)
 	for videoID, tagIDs := range videoTagIDsMap {
-		if videoTagCount > 0 && videoTagCount%100000 == 0 {
-			log.Println("Processing", videoTagCount, "video_tags")
-		}
 		for _, tagID := range tagIDs {
 			bufVideoTag = append(bufVideoTag, VideoTag{
-				VideoID: videoID,
-				TagID:   tagID,
+				VideoID:    videoID,
+				TagID:      tagID,
+				UploadTime: uniqueVideoMap[videoID].UploadTime,
 			})
 			if len(bufVideoTag) == videoTagBufSize {
-				_, err = db.NamedExec(`insert into video_tags(video_id, tag_id) values(:video_id, :tag_id)`, bufVideoTag)
+				_, err = db.NamedExec(`insert into video_tags(video_id, tag_id, upload_time) values(:video_id, :tag_id, :upload_time)`, bufVideoTag)
 				if err != nil {
 					log.Println(bufVideoTag[0], "...", bufVideoTag[len(bufVideoTag)-1])
 					log.Fatal(err)
 				}
 				bufVideoTag = bufVideoTag[:0]
+				videoTagInsertBar.Add(videoTagBufSize)
 			}
 		}
-		videoTagCount++
 	}
 	if len(bufVideoTag) > 0 {
 		_, err = db.NamedExec(`insert into video_tags(video_id, tag_id) values(:video_id, :tag_id)`, bufVideoTag)
@@ -217,7 +238,9 @@ func runFull() error {
 			log.Println(bufVideoTag[0], "...", bufVideoTag[len(bufVideoTag)-1])
 			log.Fatal(err)
 		}
+		videoTagInsertBar.Add(len(bufVideoTag))
 	}
+	videoTagInsertBar.Finish()
 	log.Println("Inserted all video_tags")
 	return nil
 }
