@@ -81,6 +81,14 @@ type Number interface {
 }
 
 func CreateBarChart[T Number](countMap map[string]T, sortedTags []string, tc *nicovideo.TagCacher) *charts.Bar {
+	endRange := -0.0009900099*float32(len(sortedTags)) + 100.0
+	if endRange < 1 {
+		endRange = 1
+	}
+	if endRange > 100 {
+		endRange = 100
+	}
+
 	bar := charts.NewBar()
 	bar.Renderer = NewNoMarginRender(bar, bar.Validate)
 	bar.SetGlobalOptions(
@@ -95,7 +103,7 @@ func CreateBarChart[T Number](countMap map[string]T, sortedTags []string, tc *ni
 		charts.WithDataZoomOpts(opts.DataZoom{
 			Type:     "inside",
 			Start:    0,
-			End:      1,
+			End:      endRange,
 			Throttle: 0,
 		}),
 		charts.WithInitializationOpts(opts.Initialization{

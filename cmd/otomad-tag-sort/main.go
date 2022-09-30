@@ -145,9 +145,6 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher, limit int
 		if allCountMap[tag] < allLimit {
 			continue
 		}
-		if allCountMap[tag] < 1000 {
-			continue
-		}
 		if countMap[tag] == allCountMap[tag] && countMap[tag] < 10 {
 			continue
 		}
@@ -194,13 +191,13 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher, limit int
 	}
 	wc.Render(fwc)
 
-	pie := chart.CreatePieChart(MIs, sortedTags, 75, tc)
-	pie.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
-	fpie, err := os.Create("docs/mipie" + additionalFileName + ".html")
-	if err != nil {
-		return err
-	}
-	pie.Render(fpie)
+	// pie := chart.CreatePieChart(MIs, sortedTags, 75, tc)
+	// pie.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
+	// fpie, err := os.Create("docs/mipie" + additionalFileName + ".html")
+	// if err != nil {
+	// 	return err
+	// }
+	// pie.Render(fpie)
 
 	err = tc.SaveToFile()
 	if err != nil {
@@ -289,13 +286,13 @@ func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.Tag
 	}
 	wc.Render(fwc)
 
-	pie := chart.CreatePieChart(MIs, sortedTags, 75, tc)
-	pie.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
-	fpie, err := os.Create("docs/" + strconv.Itoa(year) + "/mipie" + additionalFileName + ".html")
-	if err != nil {
-		return err
-	}
-	pie.Render(fpie)
+	// pie := chart.CreatePieChart(MIs, sortedTags, 75, tc)
+	// pie.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
+	// fpie, err := os.Create("docs/" + strconv.Itoa(year) + "/mipie" + additionalFileName + ".html")
+	// if err != nil {
+	// 	return err
+	// }
+	// pie.Render(fpie)
 
 	err = tc.SaveToFile()
 	if err != nil {
