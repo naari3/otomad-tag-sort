@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Awesome go-echarts</title>
+	<style>body {margin: 0;}</style>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="item" id="NJIxfqVSVjKM" style="width:100%;height:100vh;"></div>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+    let goecharts_NJIxfqVSVjKM = echarts.init(document.getElementById('NJIxfqVSVjKM'), "white");
+    let option_NJIxfqVSVjKM = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"dataZoom":[{"type":"inside","end":1}],"legend":{"show":false},"series":[{"name":"タグ","type":"bar","waveAnimation":false,"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[]}],"title":{"text":"音MAD タグ 相互情報量 2007 そのタグの音MADの投稿数が100件以上"},"tooltip":{"show":true,"trigger":"axis","axisPointer":{"type":"shadow"}},"xAxis":[{"data":[],"axisLabel":{"rotate":-90,"showMinLabel":false,"showMaxLabel":false}}],"yAxis":[{}]};
+    goecharts_NJIxfqVSVjKM.setOption(option_NJIxfqVSVjKM);
+    let option = option_NJIxfqVSVjKM;let echart = goecharts_NJIxfqVSVjKM;const chartDiv = document.querySelector("div.container > div.item");option.grid = {containLabel: true,};echart.setOption(option);window.addEventListener("resize", function() {echart.resize();});echart.on("click", (params) => {if (params.componentType === "series") {const tag = encodeURIComponent(params.name);const url = "https://www.nicovideo.jp/tag/%E9%9F%B3MAD+"+tag+"?sort=h&order=d";window.open(url, '_blank');}});
+</script>
+
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>

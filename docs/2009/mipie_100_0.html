@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Awesome go-echarts</title>
+	<style>body {margin: 0;}</style>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="item" id="jsomKFmqUeSe" style="width:100%;height:100vh;"></div>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+    let goecharts_jsomKFmqUeSe = echarts.init(document.getElementById('jsomKFmqUeSe'), "white");
+    let option_jsomKFmqUeSe = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"legend":{"show":false},"series":[{"name":"タグ","type":"pie","waveAnimation":false,"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"name":"バトルドーム","value":0.56648934},{"name":"マイムマイム","value":0.26950353},{"name":"RED_ZONE","value":0.2600297},{"name":"サンドキャニオン","value":0.24311927},{"name":"ドナルド","value":0.11410019},{"name":"松岡修造","value":0.1},{"name":"エンターテイメント","value":0.020807954},{"name":"もっと評価されるべき","value":0.01746866},{"name":"その他","value":0.011914324},{"name":"アニメ","value":0.0109079555},{"name":"東方","value":0.002890933},{"name":"投稿者コメント","value":0.0010141636},{"name":"げーむ","value":0.00042918866},{"value":0}],"label":{"show":true,"formatter":"{b}: {c}"}}],"title":{"text":"音MAD タグ 相互情報量 2009 そのタグの音MADの投稿数が100件以上"},"tooltip":{"show":true,"trigger":"item"}};
+    goecharts_jsomKFmqUeSe.setOption(option_jsomKFmqUeSe);
+    let option = option_jsomKFmqUeSe;let echart = goecharts_jsomKFmqUeSe;const chartDiv = document.querySelector("div.container > div.item");option.grid = {containLabel: true,};echart.setOption(option);window.addEventListener("resize", function() {echart.resize();});echart.on("click", (params) => {if (params.componentType === "series") {const tag = encodeURIComponent(params.name);const url = "https://www.nicovideo.jp/tag/%E9%9F%B3MAD+"+tag+"?sort=h&order=d";window.open(url, '_blank');}});
+</script>
+
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>

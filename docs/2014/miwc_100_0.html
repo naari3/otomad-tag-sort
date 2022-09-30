@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Awesome go-echarts</title>
+	<style>body {margin: 0;}</style>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts-wordcloud.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="item" id="aRzFjYzKTJfh" style="width:100%;height:100vh;"></div>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+    let goecharts_aRzFjYzKTJfh = echarts.init(document.getElementById('aRzFjYzKTJfh'), "white");
+    let option_aRzFjYzKTJfh = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"legend":{"show":false},"series":[{"name":"タグ","type":"wordCloud","waveAnimation":false,"sizeRange":[10,80],"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"name":"原曲不使用","value":0.72625697},{"name":"RED_ZONE","value":0.5860465},{"name":"Z会","value":0.4796748},{"name":"大変な途中下車シリーズ","value":0.36585367},{"name":"松岡修造","value":0.26719058},{"name":"チャージマン研!","value":0.23863636},{"name":"艦これMAD","value":0.1764706},{"name":"レスリングシリーズ","value":0.16618636},{"name":"ラブライブ！MAD","value":0.14670981},{"name":"野々村竜太郎","value":0.14405361},{"name":"クッキー☆","value":0.1239463},{"name":"ようかい体操第一","value":0.09412651},{"name":"例のアレ","value":0.058552224},{"name":"真夏の夜の淫夢","value":0.045387357},{"name":"ラブライブ!","value":0.022754313},{"name":"もっと評価されるべき","value":0.022674225},{"name":"鉄道","value":0.02017176},{"name":"アニメ","value":0.019871464},{"name":"エンターテイメント","value":0.016913963},{"name":"艦隊これくしょん","value":0.006507313},{"name":"艦これ","value":0.005766197},{"name":"その他","value":0.00573943},{"name":"政治","value":0.005155282},{"name":"げーむ","value":0.00039078132}],"textStyle":{"normal":{"color":"__f__function () {return 'rgb(' + [Math.round(Math.random() * 160),Math.round(Math.random() * 160),Math.round(Math.random() * 160)].join(',') + ')';}__f__"}}}],"title":{"text":"音MAD タグ 相互情報量 2014 そのタグの音MADの投稿数が100件以上"},"tooltip":{"show":false}};
+    goecharts_aRzFjYzKTJfh.setOption(option_aRzFjYzKTJfh);
+    let option = option_aRzFjYzKTJfh;let echart = goecharts_aRzFjYzKTJfh;const chartDiv = document.querySelector("div.container > div.item");option.grid = {containLabel: true,};echart.setOption(option);window.addEventListener("resize", function() {echart.resize();});echart.on("click", (params) => {if (params.componentType === "series") {const tag = encodeURIComponent(params.name);const url = "https://www.nicovideo.jp/tag/%E9%9F%B3MAD+"+tag+"?sort=h&order=d";window.open(url, '_blank');}});
+</script>
+
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>

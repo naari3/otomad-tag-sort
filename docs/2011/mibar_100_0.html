@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Awesome go-echarts</title>
+	<style>body {margin: 0;}</style>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="item" id="gntQVcBLcDYG" style="width:100%;height:100vh;"></div>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+    let goecharts_gntQVcBLcDYG = echarts.init(document.getElementById('gntQVcBLcDYG'), "white");
+    let option_gntQVcBLcDYG = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"dataZoom":[{"type":"inside","end":1}],"legend":{"show":false},"series":[{"name":"タグ","type":"bar","waveAnimation":false,"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"value":0.60493827},{"value":0.42884615},{"value":0.4018127},{"value":0.3979933},{"value":0.37777779},{"value":0.3411017},{"value":0.32142857},{"value":0.3198128},{"value":0.31506848},{"value":0.30612245},{"value":0.26577437},{"value":0.22556391},{"value":0.20588236},{"value":0.19441341},{"value":0.17707007},{"value":0.11057692},{"value":0.11046025},{"value":0.0868382},{"value":0.07664609},{"value":0.07564864},{"value":0.055521283},{"value":0.050559282},{"value":0.024090085},{"value":0.020586414},{"value":0.020350939},{"value":0.013244228},{"value":0.0069522643},{"value":0.005510308},{"value":0.0029085001},{"value":0.000544492}]}],"title":{"text":"音MAD タグ 相互情報量 2011 そのタグの音MADの投稿数が100件以上"},"tooltip":{"show":true,"trigger":"axis","axisPointer":{"type":"shadow"}},"xAxis":[{"data":["海外MAD","危険な○○シリーズ","マイムマイム","冷やし○○シリーズ","I'm_so_Happy","深刻な素材不足","クッキー☆","1本満足バー","バトルドーム","RED_ZONE","チャー研MAD","日常MADリンク","大変な途中下車シリーズ","チャージマン研!","松岡修造","Nyanyanyanyanyanyanya!","謎の中毒性","日常","人類には早すぎる動画","真夏の夜の淫夢","例のアレ","レスリングシリーズ","アニメ","もっと評価されるべき","エンターテイメント","鉄道","その他","東方","アイドルマスター","げーむ"],"axisLabel":{"rotate":-90,"showMinLabel":false,"showMaxLabel":false}}],"yAxis":[{}]};
+    goecharts_gntQVcBLcDYG.setOption(option_gntQVcBLcDYG);
+    let option = option_gntQVcBLcDYG;let echart = goecharts_gntQVcBLcDYG;const chartDiv = document.querySelector("div.container > div.item");option.grid = {containLabel: true,};echart.setOption(option);window.addEventListener("resize", function() {echart.resize();});echart.on("click", (params) => {if (params.componentType === "series") {const tag = encodeURIComponent(params.name);const url = "https://www.nicovideo.jp/tag/%E9%9F%B3MAD+"+tag+"?sort=h&order=d";window.open(url, '_blank');}});
+</script>
+
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>

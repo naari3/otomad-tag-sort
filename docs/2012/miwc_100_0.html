@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Awesome go-echarts</title>
+	<style>body {margin: 0;}</style>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts-wordcloud.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="item" id="zyzawzKUIxTK" style="width:100%;height:100vh;"></div>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+    let goecharts_zyzawzKUIxTK = echarts.init(document.getElementById('zyzawzKUIxTK'), "white");
+    let option_zyzawzKUIxTK = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"legend":{"show":false},"series":[{"name":"タグ","type":"wordCloud","waveAnimation":false,"sizeRange":[10,80],"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"name":"トレジャーシュート","value":0.83687943},{"name":"on_and_on","value":0.76510066},{"name":"海外MAD","value":0.68421054},{"name":"Beastmania","value":0.67597765},{"name":"原曲不使用","value":0.6122449},{"name":"I'm_so_Happy","value":0.5555556},{"name":"サンドキャニオン","value":0.53763443},{"name":"危険な○○シリーズ","value":0.48076922},{"name":"KYM","value":0.46570396},{"name":"マイムマイム","value":0.43846154},{"name":"日常MADリンク","value":0.4068323},{"name":"深刻な素材不足","value":0.39082968},{"name":"バトルドーム","value":0.3882784},{"name":"クッキー☆","value":0.3880597},{"name":"RED_ZONE","value":0.3432836},{"name":"チャー研MAD","value":0.28125},{"name":"ドナルド","value":0.2655889},{"name":"松岡修造","value":0.24308465},{"name":"大変な途中下車シリーズ","value":0.23854661},{"name":"チャージマン研!","value":0.2383863},{"name":"日常","value":0.12340426},{"name":"謎の中毒性","value":0.12135922},{"name":"レスリングシリーズ","value":0.09697309},{"name":"人類には早すぎる動画","value":0.0947165},{"name":"真夏の夜の淫夢","value":0.07736804},{"name":"這いよれ！ニャル子さん","value":0.071428575},{"name":"例のアレ","value":0.06929545},{"name":"ゆるゆり","value":0.06874329},{"name":"アニメ","value":0.025089663},{"name":"もっと評価されるべき","value":0.023551825},{"name":"エンターテイメント","value":0.018650215},{"name":"料理","value":0.015367421},{"name":"その他","value":0.011092994},{"name":"東方","value":0.005443459},{"name":"アイドルマスター","value":0.003488741},{"name":"げーむ","value":0.00060719886}],"textStyle":{"normal":{"color":"__f__function () {return 'rgb(' + [Math.round(Math.random() * 160),Math.round(Math.random() * 160),Math.round(Math.random() * 160)].join(',') + ')';}__f__"}}}],"title":{"text":"音MAD タグ 相互情報量 2012 そのタグの音MADの投稿数が100件以上"},"tooltip":{"show":false}};
+    goecharts_zyzawzKUIxTK.setOption(option_zyzawzKUIxTK);
+    let option = option_zyzawzKUIxTK;let echart = goecharts_zyzawzKUIxTK;const chartDiv = document.querySelector("div.container > div.item");option.grid = {containLabel: true,};echart.setOption(option);window.addEventListener("resize", function() {echart.resize();});echart.on("click", (params) => {if (params.componentType === "series") {const tag = encodeURIComponent(params.name);const url = "https://www.nicovideo.jp/tag/%E9%9F%B3MAD+"+tag+"?sort=h&order=d";window.open(url, '_blank');}});
+</script>
+
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>

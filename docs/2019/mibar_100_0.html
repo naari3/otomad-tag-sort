@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Awesome go-echarts</title>
+	<style>body {margin: 0;}</style>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="item" id="EVdOXWvUgZLd" style="width:100%;height:100vh;"></div>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+    let goecharts_EVdOXWvUgZLd = echarts.init(document.getElementById('EVdOXWvUgZLd'), "white");
+    let option_EVdOXWvUgZLd = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"dataZoom":[{"type":"inside","end":1}],"legend":{"show":false},"series":[{"name":"タグ","type":"bar","waveAnimation":false,"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"value":0.9843137},{"value":0.97709924},{"value":0.9471366},{"value":0.9367816},{"value":0.93162394},{"value":0.9194631},{"value":0.9121339},{"value":0.91056913},{"value":0.9103691},{"value":0.8232044},{"value":0.78280044},{"value":0.77717394},{"value":0.771831},{"value":0.757377},{"value":0.75714284},{"value":0.75454545},{"value":0.7526042},{"value":0.7329193},{"value":0.7202797},{"value":0.7046632},{"value":0.6990741},{"value":0.6599327},{"value":0.6081081},{"value":0.5780591},{"value":0.56296295},{"value":0.54891306},{"value":0.54385966},{"value":0.46581197},{"value":0.44918874},{"value":0.4056604},{"value":0.38513514},{"value":0.36697248},{"value":0.34508815},{"value":0.34114584},{"value":0.32600734},{"value":0.32443532},{"value":0.23622048},{"value":0.21533923},{"value":0.19244392},{"value":0.13710451},{"value":0.09281437},{"value":0.08719346},{"value":0.08405518},{"value":0.069682844},{"value":0.045490824},{"value":0.035870094},{"value":0.03499392},{"value":0.031385556},{"value":0.02962963},{"value":0.028126352},{"value":0.027109854},{"value":0.027055986},{"value":0.025402505},{"value":0.019956047},{"value":0.018910626},{"value":0.015608287},{"value":0.014933892},{"value":0.012121422},{"value":0.01181862},{"value":0.010038787},{"value":0.0008128185}]}],"title":{"text":"音MAD タグ 相互情報量 2019 そのタグの音MADの投稿数が100件以上"},"tooltip":{"show":true,"trigger":"axis","axisPointer":{"type":"shadow"}},"xAxis":[{"data":["私的オールスター","Hikakin_Mad","YTPMV","ダダダダ天使MADリンク","on_and_on","曲が素材シリーズ","芸人MAD","Mememe_Dice","原曲不使用","Z会","大変な途中下車シリーズ","柴又(2号.)","RED_WINGリスペクトシリーズ","TRAIN_ZONE","ナユタンMAD","深刻な素材不足","RED_ZONE","鉄道MAD","MGRoid","グルメレース","REDZONE","松岡修造","合作","卵シリーズ","ドナルド","ダダダダ天使","東方夏淫夢","チャージマン研!","Hikakin_Mania","バーチャルYoutuberMAD","Hikakin","ICG姉貴","人力VOCALOID","NYN姉貴","にじさんじmad","レスリングシリーズ","Nippendo","人類には早すぎる動画","クッキー☆","鉄道","Syamu_game","野獣先輩","真夏の夜の淫夢","例のアレ","もっと評価されるべき","MAD","エンターテイメント","けものフレンズ","自然","アイドル部","日記",".LIVE","アイドルマスター_シンデレラガールズ","アニメ","アイドルマスター","バーチャル","その他","バーチャルYouTuber","にじさんじ","東方","げーむ"],"axisLabel":{"rotate":-90,"showMinLabel":false,"showMaxLabel":false}}],"yAxis":[{}]};
+    goecharts_EVdOXWvUgZLd.setOption(option_EVdOXWvUgZLd);
+    let option = option_EVdOXWvUgZLd;let echart = goecharts_EVdOXWvUgZLd;const chartDiv = document.querySelector("div.container > div.item");option.grid = {containLabel: true,};echart.setOption(option);window.addEventListener("resize", function() {echart.resize();});echart.on("click", (params) => {if (params.componentType === "series") {const tag = encodeURIComponent(params.name);const url = "https://www.nicovideo.jp/tag/%E9%9F%B3MAD+"+tag+"?sort=h&order=d";window.open(url, '_blank');}});
+</script>
+
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>

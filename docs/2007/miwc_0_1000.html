@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Awesome go-echarts</title>
+	<style>body {margin: 0;}</style>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts-wordcloud.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="item" id="UpWCdPzVQDQC" style="width:100%;height:100vh;"></div>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+    let goecharts_UpWCdPzVQDQC = echarts.init(document.getElementById('UpWCdPzVQDQC'), "white");
+    let option_UpWCdPzVQDQC = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"legend":{"show":false},"series":[{"name":"タグ","type":"wordCloud","waveAnimation":false,"sizeRange":[10,80],"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"name":"腹筋崩壊","value":0.0074626864},{"name":"吹いたら負け","value":0.006751055},{"name":"らき☆すた","value":0.006329114},{"name":"鉄道","value":0.0053078556},{"name":"もっと評価されるべき","value":0.0049870703},{"name":"涼宮ハルヒの憂鬱","value":0.0046158917},{"name":"カオス","value":0.004475183},{"name":"エンターテイメント","value":0.0038153375},{"name":"衝撃のラスト","value":0.0035746202},{"name":"これはひどい","value":0.0035242292},{"name":"東方","value":0.0028328612},{"name":"ぽけもん","value":0.0027311745},{"name":"ひぐらしのなく頃に","value":0.0022712525},{"name":"アニメ","value":0.0021627774},{"name":"Beatmania","value":0.0020449897},{"name":"出オチ","value":0.0019860973},{"name":"才能の無駄遣い","value":0.0019305019},{"name":"MAD","value":0.0018720019},{"name":"サムネほいほい","value":0.001814882},{"name":"テイルズ","value":0.0017226529},{"name":"踊ってみた","value":0.0016528926},{"name":"マリオ","value":0.001367054},{"name":"おっさんホイホイ","value":0.0012536565},{"name":"自然","value":0.000999001},{"name":"音ゲー","value":0.000990753},{"name":"癒し","value":0.0009784736},{"name":"その他","value":0.00096320553},{"name":"作業用BGM","value":0.0009592326},{"name":"千早","value":0.00093196647},{"name":"ひろくん","value":0.00092081033},{"name":"忙しい人向けシリーズ","value":0.00087950745},{"name":"政治","value":0.000870322},{"name":"永井先生","value":0.0008561644},{"name":"投稿者コメント","value":0.0008053151},{"name":"てすと","value":0.0008035356},{"name":"組曲『ニコニコ動画』","value":0.00078926596},{"name":"ミクオリジナル曲","value":0.00078554597},{"name":"歴史","value":0.0007374631},{"name":"任天堂","value":0.00072516315},{"name":"初音ミク","value":0.00071676023},{"name":"R-18","value":0.0006930007},{"name":"ロックマン","value":0.0006830601},{"name":"遊戯王","value":0.00048899755},{"name":"ゲーム音楽","value":0.00034199728},{"name":"格闘げーム","value":0.00031496063},{"name":"動物","value":0.00030679553},{"name":"歌ってみた","value":0.00028623224},{"name":"げーむ","value":0.00025279995},{"name":"エロゲ","value":0.00023820867},{"name":"アイドルマスター","value":0.00022298201},{"name":"ファミコン","value":0.0002059308},{"name":"Xbox360","value":0.00019623234},{"name":"音楽","value":0.0001601452},{"name":"VOCALOID","value":0.00012809018},{"name":"スポーツ","value":0.000124471}],"textStyle":{"normal":{"color":"__f__function () {return 'rgb(' + [Math.round(Math.random() * 160),Math.round(Math.random() * 160),Math.round(Math.random() * 160)].join(',') + ')';}__f__"}}}],"title":{"text":"音MAD タグ 相互情報量 2007 タグの投稿数が1000件以上"},"tooltip":{"show":false}};
+    goecharts_UpWCdPzVQDQC.setOption(option_UpWCdPzVQDQC);
+    let option = option_UpWCdPzVQDQC;let echart = goecharts_UpWCdPzVQDQC;const chartDiv = document.querySelector("div.container > div.item");option.grid = {containLabel: true,};echart.setOption(option);window.addEventListener("resize", function() {echart.resize();});echart.on("click", (params) => {if (params.componentType === "series") {const tag = encodeURIComponent(params.name);const url = "https://www.nicovideo.jp/tag/%E9%9F%B3MAD+"+tag+"?sort=h&order=d";window.open(url, '_blank');}});
+</script>
+
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>

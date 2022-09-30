@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Awesome go-echarts</title>
+	<style>body {margin: 0;}</style>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="item" id="oPKyxyOyCNqY" style="width:100%;height:100vh;"></div>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+    let goecharts_oPKyxyOyCNqY = echarts.init(document.getElementById('oPKyxyOyCNqY'), "white");
+    let option_oPKyxyOyCNqY = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"legend":{"show":false},"series":[{"name":"タグ","type":"pie","waveAnimation":false,"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"name":"海外MAD","value":0.60493827},{"name":"危険な○○シリーズ","value":0.42884615},{"name":"マイムマイム","value":0.4018127},{"name":"冷やし○○シリーズ","value":0.3979933},{"name":"I'm_so_Happy","value":0.37777779},{"name":"深刻な素材不足","value":0.3411017},{"name":"クッキー☆","value":0.32142857},{"name":"1本満足バー","value":0.3198128},{"name":"バトルドーム","value":0.31506848},{"name":"RED_ZONE","value":0.30612245},{"name":"チャー研MAD","value":0.26577437},{"name":"日常MADリンク","value":0.22556391},{"name":"大変な途中下車シリーズ","value":0.20588236},{"name":"チャージマン研!","value":0.19441341},{"name":"松岡修造","value":0.17707007},{"name":"Nyanyanyanyanyanyanya!","value":0.11057692},{"name":"謎の中毒性","value":0.11046025},{"name":"日常","value":0.0868382},{"name":"人類には早すぎる動画","value":0.07664609},{"name":"真夏の夜の淫夢","value":0.07564864},{"name":"例のアレ","value":0.055521283},{"name":"レスリングシリーズ","value":0.050559282},{"name":"アニメ","value":0.024090085},{"name":"もっと評価されるべき","value":0.020586414},{"name":"エンターテイメント","value":0.020350939},{"name":"鉄道","value":0.013244228},{"name":"その他","value":0.0069522643},{"name":"東方","value":0.005510308},{"name":"アイドルマスター","value":0.0029085001},{"name":"げーむ","value":0.000544492},{"value":0}],"label":{"show":true,"formatter":"{b}: {c}"}}],"title":{"text":"音MAD タグ 相互情報量 2011 そのタグの音MADの投稿数が100件以上"},"tooltip":{"show":true,"trigger":"item"}};
+    goecharts_oPKyxyOyCNqY.setOption(option_oPKyxyOyCNqY);
+    let option = option_oPKyxyOyCNqY;let echart = goecharts_oPKyxyOyCNqY;const chartDiv = document.querySelector("div.container > div.item");option.grid = {containLabel: true,};echart.setOption(option);window.addEventListener("resize", function() {echart.resize();});echart.on("click", (params) => {if (params.componentType === "series") {const tag = encodeURIComponent(params.name);const url = "https://www.nicovideo.jp/tag/%E9%9F%B3MAD+"+tag+"?sort=h&order=d";window.open(url, '_blank');}});
+</script>
+
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>

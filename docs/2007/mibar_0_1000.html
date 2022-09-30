@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Awesome go-echarts</title>
+	<style>body {margin: 0;}</style>
+    <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div class="item" id="udSwDOMRkzXW" style="width:100%;height:100vh;"></div>
+</div>
+
+<script type="text/javascript">
+    "use strict";
+    let goecharts_udSwDOMRkzXW = echarts.init(document.getElementById('udSwDOMRkzXW'), "white");
+    let option_udSwDOMRkzXW = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"dataZoom":[{"type":"inside","end":1}],"legend":{"show":false},"series":[{"name":"タグ","type":"bar","waveAnimation":false,"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"value":0.0074626864},{"value":0.006751055},{"value":0.006329114},{"value":0.0053078556},{"value":0.0049870703},{"value":0.0046158917},{"value":0.004475183},{"value":0.0038153375},{"value":0.0035746202},{"value":0.0035242292},{"value":0.0028328612},{"value":0.0027311745},{"value":0.0022712525},{"value":0.0021627774},{"value":0.0020449897},{"value":0.0019860973},{"value":0.0019305019},{"value":0.0018720019},{"value":0.001814882},{"value":0.0017226529},{"value":0.0016528926},{"value":0.001367054},{"value":0.0012536565},{"value":0.000999001},{"value":0.000990753},{"value":0.0009784736},{"value":0.00096320553},{"value":0.0009592326},{"value":0.00093196647},{"value":0.00092081033},{"value":0.00087950745},{"value":0.000870322},{"value":0.0008561644},{"value":0.0008053151},{"value":0.0008035356},{"value":0.00078926596},{"value":0.00078554597},{"value":0.0007374631},{"value":0.00072516315},{"value":0.00071676023},{"value":0.0006930007},{"value":0.0006830601},{"value":0.00048899755},{"value":0.00034199728},{"value":0.00031496063},{"value":0.00030679553},{"value":0.00028623224},{"value":0.00025279995},{"value":0.00023820867},{"value":0.00022298201},{"value":0.0002059308},{"value":0.00019623234},{"value":0.0001601452},{"value":0.00012809018},{"value":0.000124471}]}],"title":{"text":"音MAD タグ 相互情報量 2007 タグの投稿数が1000件以上"},"tooltip":{"show":true,"trigger":"axis","axisPointer":{"type":"shadow"}},"xAxis":[{"data":["腹筋崩壊","吹いたら負け","らき☆すた","鉄道","もっと評価されるべき","涼宮ハルヒの憂鬱","カオス","エンターテイメント","衝撃のラスト","これはひどい","東方","ぽけもん","ひぐらしのなく頃に","アニメ","Beatmania","出オチ","才能の無駄遣い","MAD","サムネほいほい","テイルズ","踊ってみた","マリオ","おっさんホイホイ","自然","音ゲー","癒し","その他","作業用BGM","千早","ひろくん","忙しい人向けシリーズ","政治","永井先生","投稿者コメント","てすと","組曲『ニコニコ動画』","ミクオリジナル曲","歴史","任天堂","初音ミク","R-18","ロックマン","遊戯王","ゲーム音楽","格闘げーム","動物","歌ってみた","げーむ","エロゲ","アイドルマスター","ファミコン","Xbox360","音楽","VOCALOID","スポーツ"],"axisLabel":{"rotate":-90,"showMinLabel":false,"showMaxLabel":false}}],"yAxis":[{}]};
+    goecharts_udSwDOMRkzXW.setOption(option_udSwDOMRkzXW);
+    let option = option_udSwDOMRkzXW;let echart = goecharts_udSwDOMRkzXW;const chartDiv = document.querySelector("div.container > div.item");option.grid = {containLabel: true,};echart.setOption(option);window.addEventListener("resize", function() {echart.resize();});echart.on("click", (params) => {if (params.componentType === "series") {const tag = encodeURIComponent(params.name);const url = "https://www.nicovideo.jp/tag/%E9%9F%B3MAD+"+tag+"?sort=h&order=d";window.open(url, '_blank');}});
+</script>
+
+<style>
+    .container {display: flex;justify-content: center;align-items: center;}
+    .item {margin: auto;}
+</style>
+</body>
+</html>

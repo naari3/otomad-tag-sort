@@ -115,7 +115,7 @@ func createChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.TagCa
 	return nil
 }
 
-func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
+func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher, limit int, allLimit int) error {
 	fmt.Println("Start")
 	countMap, err := nicovideo.GetCountGroupByOtomadTag(videos, func(video nicovideo.Video) bool { return true })
 	if err != nil {
@@ -125,6 +125,9 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 
 	targets := make([]string, 0, len(countMap))
 	for tag := range countMap {
+		if countMap[tag] < limit {
+			continue
+		}
 		targets = append(targets, tag)
 	}
 
@@ -139,7 +142,13 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 		if allCountMap[tag] == 0 {
 			continue
 		}
-		if countMap[tag] == allCountMap[tag] {
+		if allCountMap[tag] < allLimit {
+			continue
+		}
+		if allCountMap[tag] < 1000 {
+			continue
+		}
+		if countMap[tag] == allCountMap[tag] && countMap[tag] < 10 {
 			continue
 		}
 		mi := float32(countMap[tag]) / float32(allCountMap[tag])
@@ -155,25 +164,39 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 	})
 	fmt.Println("Sorted By MI")
 
+	additionalInfo := ""
+	if limit != 0 {
+		additionalInfo += " そのタグの音MADの投稿数が" + strconv.Itoa(limit) + "件以上"
+	}
+	if allLimit != 0 {
+		additionalInfo += " タグの投稿数が" + strconv.Itoa(allLimit) + "件以上"
+	}
+
+	additionalFileName := ""
+	if limit != 0 || allLimit != 0 {
+		additionalFileName += "_" + strconv.Itoa(limit)
+		additionalFileName += "_" + strconv.Itoa(allLimit)
+	}
+
 	bar := chart.CreateBarChart(MIs, sortedTags, tc)
-	bar.Title = opts.Title{Title: "音MAD タグ 相互情報量"}
-	fbar, err := os.Create("docs/mibar.html")
+	bar.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
+	fbar, err := os.Create("docs/mibar" + additionalFileName + ".html")
 	if err != nil {
 		return err
 	}
 	bar.Render(fbar)
 
 	wc := chart.CreateWordCloud(MIs, sortedTags, 0, tc)
-	wc.Title = opts.Title{Title: "音MAD タグ 相互情報量"}
-	fwc, err := os.Create("docs/miwc.html")
+	wc.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
+	fwc, err := os.Create("docs/miwc" + additionalFileName + ".html")
 	if err != nil {
 		return err
 	}
 	wc.Render(fwc)
 
 	pie := chart.CreatePieChart(MIs, sortedTags, 75, tc)
-	pie.Title = opts.Title{Title: "音MAD タグ 相互情報量"}
-	fpie, err := os.Create("docs/mipie.html")
+	pie.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
+	fpie, err := os.Create("docs/mipie" + additionalFileName + ".html")
 	if err != nil {
 		return err
 	}
@@ -188,7 +211,7 @@ func createMICharts(videos []nicovideo.Video, tc *nicovideo.TagCacher) error {
 	return nil
 }
 
-func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.TagCacher) error {
+func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.TagCacher, limit int, allLimit int) error {
 	fmt.Println("Start")
 	countMap, err := nicovideo.GetCountGroupByOtomadTag(videos, func(video nicovideo.Video) bool { return video.UploadTime.Year() == year })
 	if err != nil {
@@ -198,6 +221,9 @@ func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.Tag
 
 	targets := make([]string, 0, len(countMap))
 	for tag := range countMap {
+		if countMap[tag] < limit {
+			continue
+		}
 		targets = append(targets, tag)
 	}
 
@@ -210,6 +236,9 @@ func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.Tag
 	MIs := make(map[string]float32, 0)
 	for tag := range countMap {
 		if allCountMap[tag] == 0 {
+			continue
+		}
+		if allCountMap[tag] < allLimit {
 			continue
 		}
 		if countMap[tag] == allCountMap[tag] {
@@ -228,25 +257,41 @@ func createMIChartsForYear(videos []nicovideo.Video, year int, tc *nicovideo.Tag
 	})
 	fmt.Println("Sorted By MI")
 
+	additionalInfo := ""
+	if year != 0 {
+		additionalInfo = " " + strconv.Itoa(year)
+	}
+	if limit != 0 {
+		additionalInfo += " そのタグの音MADの投稿数が" + strconv.Itoa(limit) + "件以上"
+	}
+	if allLimit != 0 {
+		additionalInfo += " タグの投稿数が" + strconv.Itoa(allLimit) + "件以上"
+	}
+	additionalFileName := ""
+	if limit != 0 || allLimit != 0 {
+		additionalFileName += "_" + strconv.Itoa(limit)
+		additionalFileName += "_" + strconv.Itoa(allLimit)
+	}
+
 	bar := chart.CreateBarChart(MIs, sortedTags, tc)
-	bar.Title = opts.Title{Title: "音MAD タグ 相互情報量 " + strconv.Itoa(year)}
-	fbar, err := os.Create("docs/" + strconv.Itoa(year) + "/mibar.html")
+	bar.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
+	fbar, err := os.Create("docs/" + strconv.Itoa(year) + "/mibar" + additionalFileName + ".html")
 	if err != nil {
 		return err
 	}
 	bar.Render(fbar)
 
 	wc := chart.CreateWordCloud(MIs, sortedTags, 0, tc)
-	wc.Title = opts.Title{Title: "音MAD タグ 相互情報量 " + strconv.Itoa(year)}
-	fwc, err := os.Create("docs/" + strconv.Itoa(year) + "/miwc.html")
+	wc.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
+	fwc, err := os.Create("docs/" + strconv.Itoa(year) + "/miwc" + additionalFileName + ".html")
 	if err != nil {
 		return err
 	}
 	wc.Render(fwc)
 
 	pie := chart.CreatePieChart(MIs, sortedTags, 75, tc)
-	pie.Title = opts.Title{Title: "音MAD タグ 相互情報量 " + strconv.Itoa(year)}
-	fpie, err := os.Create("docs/" + strconv.Itoa(year) + "/mipie.html")
+	pie.Title = opts.Title{Title: "音MAD タグ 相互情報量" + additionalInfo}
+	fpie, err := os.Create("docs/" + strconv.Itoa(year) + "/mipie" + additionalFileName + ".html")
 	if err != nil {
 		return err
 	}
@@ -296,7 +341,17 @@ func main() {
 		panic(err)
 	}
 
-	err = createMICharts(videos, tc)
+	err = createMICharts(videos, tc, 0, 0)
+	if err != nil {
+		panic(err)
+	}
+
+	err = createMICharts(videos, tc, 100, 0)
+	if err != nil {
+		panic(err)
+	}
+
+	err = createMICharts(videos, tc, 0, 1000)
 	if err != nil {
 		panic(err)
 	}
@@ -306,7 +361,15 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		err = createMIChartsForYear(videos, year, tc)
+		err = createMIChartsForYear(videos, year, tc, 0, 0)
+		if err != nil {
+			panic(err)
+		}
+		err = createMIChartsForYear(videos, year, tc, 100, 0)
+		if err != nil {
+			panic(err)
+		}
+		err = createMIChartsForYear(videos, year, tc, 0, 1000)
 		if err != nil {
 			panic(err)
 		}
